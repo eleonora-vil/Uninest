@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CssVarsProvider, extendTheme, useColorScheme } from "@mui/joy/styles";
+import { CssVarsProvider, extendTheme } from "@mui/joy/styles";
 import GlobalStyles from "@mui/joy/GlobalStyles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import Box from "@mui/joy/Box";
@@ -12,87 +12,143 @@ import IconButton from "@mui/joy/IconButton";
 import Link from "@mui/joy/Link";
 import Input from "@mui/joy/Input";
 import Typography from "@mui/joy/Typography";
+import Select from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
 import Stack from "@mui/joy/Stack";
-import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
-import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
-import BadgeRoundedIcon from "@mui/icons-material/BadgeRounded";
+import { useNavigate } from "react-router-dom";
+// import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
+// import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import GoogleIcon from "../GoogleIcon";
-
-function ColorSchemeToggle(props) {
-  const { onClick, ...other } = props;
-  const { mode, setMode } = useColorScheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => setMounted(true), []);
-
-  return (
-    <IconButton
-      aria-label="toggle light/dark mode"
-      size="sm"
-      variant="outlined"
-      disabled={!mounted}
-      onClick={(event) => {
-        setMode(mode === "light" ? "dark" : "light");
-        onClick?.(event);
-      }}
-      {...other}
-    >
-      {mode === "light" ? <DarkModeRoundedIcon /> : <LightModeRoundedIcon />}
-    </IconButton>
-  );
-}
+// import GoogleIcon from "../GoogleIcon";
+import api from "../config/axios";
 
 const customTheme = extendTheme({ defaultColorScheme: "dark" });
 
 export default function AuthPage() {
-  const [authMode, setAuthMode] = React.useState("signin");
   // 'signin', 'signup', or 'forgotpassword'
+  const [authMode, setAuthMode] = React.useState("signin");
+
+  //
+  const [email, setEmail] = React.useState("");
+
+  // for first time login
+  const [isFirstLogin, setIsFirstLogin] = React.useState(false);
 
   const toggleAuthMode = (mode) => {
     setAuthMode(mode);
   };
 
-  // Set Logo
-  //   const CompanyLogoButton = () => (
-  //     <IconButton variant="soft" color="primary" size="sm">
-  //       <img
-  //         src="https://scontent.fsgn20-1.fna.fbcdn.net/v/t39.30808-6/460535538_122105294522523904_2461728936276430116_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=sOcqU-oVd_gQ7kNvgE-YNu6&_nc_ht=scontent.fsgn20-1.fna&_nc_gid=AiovkpM2EY65PFsglqEFYdO&oh=00_AYAWBfXjRqpBiDpTpEx49F5L4bxesCZ7aSSWsSkj__ZP-g&oe=66F2EF86"
-  //         alt="Company Logo"
-  //       />
-  //     </IconButton>
-  //   );
+  const CompanyLogoButton = () => (
+    <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
+      <img
+        src="https://scontent.fsgn20-1.fna.fbcdn.net/v/t39.30808-6/460535538_122105294522523904_2461728936276430116_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=sOcqU-oVd_gQ7kNvgE-YNu6&_nc_ht=scontent.fsgn20-1.fna&_nc_gid=AiovkpM2EY65PFsglqEFYdO&oh=00_AYAWBfXjRqpBiDpTpEx49F5L4bxesCZ7aSSWsSkj__ZP-g&oe=66F2EF86"
+        alt="Company Logo"
+        style={{
+          width: 64,
+          height: 64,
+          objectFit: "contain",
+        }}
+      />
+    </IconButton>
+  );
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const formElements = event.currentTarget.elements;
-    let data;
-    switch (authMode) {
-      case "signin":
-        data = {
-          email: formElements.email.value,
-          password: formElements.password.value,
-          persistent: formElements.persistent?.checked,
-        };
-        break;
-      case "signup":
-        data = {
-          name: formElements.name.value,
-          email: formElements.email.value,
-          password: formElements.password.value,
-          confirmPassword: formElements.confirmPassword.value,
-          terms: formElements.terms.checked,
-        };
-        break;
-      case "forgotpassword":
-        data = {
-          email: formElements.email.value,
-        };
-        break;
-    }
-    alert(JSON.stringify(data, null, 2));
+  const navigate = useNavigate();
+  // const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const handleHomeClick = () => {
+    navigate("/");
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    // let data;
+    switch (authMode) {
+      case "signin":
+        // handle Login here
+        try {
+          const response = await api.post("Auth/Login", {
+            email: formData.get("email"),
+            password: formData.get("password"),
+          });
+
+          if (response.data.requireOTP) {
+            setEmail(formData.get("email"));
+            setIsFirstLogin(true);
+            toggleAuthMode("verifyOTP");
+          } else {
+            const { token } = response.data;
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(response.data));
+            navigate("/");
+          }
+          navigate("/");
+        } catch (err) {
+          console.log(err);
+          alert(err.response?.data || "An error occurred during login");
+        }
+
+        break;
+      case "signup":
+        // handle SignUp
+        try {
+          await api.post("Auth/Signup", {
+            fullname: formData.get("fullName"),
+            userName: formData.get("userName"),
+            email: formData.get("email"),
+            password: formData.get("password"),
+            doB: formData.get("doB"),
+            phone: formData.get("phone"),
+            gender: formData.get("gender"),
+            address: formData.get("address"),
+            terms: formData.get("terms") === "on",
+          });
+          alert(
+            "Registration successful! Please sign in with your new account."
+          );
+          setEmail(formData.get("email"));
+          setIsFirstLogin(true);
+          toggleAuthMode("verifyOTP"); // Redirect to signin after successful registration
+        } catch (err) {
+          console.error(err);
+          alert(err.response?.data || "An error occurred during Sign Up");
+        }
+        break;
+
+      case "forgotpassword":
+        // Connect forgot password here
+        try {
+          await api.post("User/ForgotPassword", {
+            email: formData.get("email"),
+          });
+          setEmail(formData.get("email"));
+          setIsFirstLogin(false);
+          toggleAuthMode("verifyOTP");
+        } catch (err) {
+          console.error(err);
+          alert(err.response?.data || "An error occurred for this function");
+        }
+        break;
+
+      case "verifyOTP":
+        try {
+          await api.post("User/SubmitOTP", {
+            email: email,
+            otp: formData.get("otp"),
+          });
+          if (isFirstLogin) {
+            alert("Email verified successfully. You can now log in.");
+            toggleAuthMode("signin");
+          }
+        } catch (err) {
+          console.error(err);
+          alert(
+            err.response?.data || "An error occurred during OTP verification"
+          );
+        }
+        break;
+    }
+  };
   return (
     <CssVarsProvider theme={customTheme} disableTransitionOnChange>
       <CssBaseline />
@@ -134,12 +190,17 @@ export default function AuthPage() {
             sx={{ py: 3, display: "flex", justifyContent: "space-between" }}
           >
             <Box sx={{ gap: 2, display: "flex", alignItems: "center" }}>
-              <IconButton variant="soft" color="primary" size="sm">
-                <BadgeRoundedIcon />
-              </IconButton>
-              <Typography level="title-lg">UNINEST</Typography>
+              {/* <CompanyLogoButton /> */}
+              <Button
+                variant="plain"
+                startDecorator={<CompanyLogoButton />}
+                size="lg"
+                color="neutral"
+                onClick={handleHomeClick}
+              >
+                UNINEST
+              </Button>
             </Box>
-            <ColorSchemeToggle />
           </Box>
           <Box
             component="main"
@@ -166,7 +227,8 @@ export default function AuthPage() {
           >
             <Stack sx={{ gap: 4, mb: 2 }}>
               <Stack sx={{ gap: 1 }}>
-                {authMode === "forgotpassword" && (
+                {(authMode === "forgotpassword" ||
+                  authMode === "verifyOTP") && (
                   <IconButton
                     onClick={() => toggleAuthMode("signin")}
                     sx={{ alignSelf: "flex-start", mb: 1 }}
@@ -179,12 +241,16 @@ export default function AuthPage() {
                     ? "Sign in"
                     : authMode === "signup"
                     ? "Sign up"
-                    : "Forgot Password"}
+                    : authMode === "forgotpassword"
+                    ? "Forgot Password"
+                    : authMode === "verifyOTP"
+                    ? "Verify OTP"
+                    : ""}
                 </Typography>
                 {authMode !== "forgotpassword" && (
                   <Typography level="body-sm">
                     {authMode === "signin"
-                      ? "New to company? "
+                      ? "Don't have an account yet? "
                       : "Already have an account? "}
                     <Link
                       component="button"
@@ -206,7 +272,7 @@ export default function AuthPage() {
                   </Typography>
                 )}
               </Stack>
-              {authMode === "signin" && (
+              {/* {authMode === "signin" && (
                 <Button
                   variant="soft"
                   color="neutral"
@@ -215,15 +281,28 @@ export default function AuthPage() {
                 >
                   Continue with Google
                 </Button>
-              )}
+              )} */}
             </Stack>
             {authMode === "signin" && <Divider>or</Divider>}
             <Stack sx={{ gap: 4, mt: 2 }}>
               <form onSubmit={handleSubmit}>
+                {authMode === "verifyOTP" && (
+                  <FormControl required>
+                    <FormLabel>Enter OTP</FormLabel>
+                    <Input type="text" name="otp" />
+                  </FormControl>
+                )}
+
                 {authMode === "signup" && (
                   <FormControl required>
-                    <FormLabel>Name</FormLabel>
-                    <Input type="text" name="name" />
+                    <FormLabel>Full Name</FormLabel>
+                    <Input type="text" name="fullName" />
+                  </FormControl>
+                )}
+                {authMode === "signup" && (
+                  <FormControl required>
+                    <FormLabel>User Name</FormLabel>
+                    <Input type="text" name="userName" />
                   </FormControl>
                 )}
                 <FormControl required>
@@ -238,8 +317,30 @@ export default function AuthPage() {
                 )}
                 {authMode === "signup" && (
                   <FormControl required>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <Input type="password" name="confirmPassword" />
+                    <FormLabel>Date of Birth</FormLabel>
+                    <Input type="date" name="doB" />
+                  </FormControl>
+                )}
+                {authMode === "signup" && (
+                  <FormControl required>
+                    <FormLabel>Phone</FormLabel>
+                    <Input type="text" name="phone" />
+                  </FormControl>
+                )}
+                {authMode === "signup" && (
+                  <FormControl required>
+                    <FormLabel>Gender</FormLabel>
+                    <Select defaultValue="gender" name="gender">
+                      <Option value="male">Nam</Option>
+                      <Option value="female">Nữ</Option>
+                      <Option value="other">Khác</Option>
+                    </Select>
+                  </FormControl>
+                )}
+                {authMode === "signup" && (
+                  <FormControl required>
+                    <FormLabel>Address</FormLabel>
+                    <Input type="text" name="address" />
                   </FormControl>
                 )}
                 <Stack sx={{ gap: 4, mt: 2 }}>
@@ -277,7 +378,11 @@ export default function AuthPage() {
                       ? "Sign in"
                       : authMode === "signup"
                       ? "Sign up"
-                      : "Reset Password"}
+                      : authMode === "forgotpassword"
+                      ? "Reset Password"
+                      : authMode === "verifyOTP"
+                      ? "Verify OTP"
+                      : "Confirm"}
                   </Button>
                 </Stack>
               </form>
@@ -285,13 +390,13 @@ export default function AuthPage() {
           </Box>
           <Box component="footer" sx={{ py: 3 }}>
             <Typography level="body-xs" sx={{ textAlign: "center" }}>
-              © Your company {new Date().getFullYear()}
+              © UNINEST {new Date().getFullYear()}
             </Typography>
           </Box>
         </Box>
       </Box>
       <Box
-        sx={(theme) => ({
+        sx={() => ({
           height: "100%",
           position: "fixed",
           right: 0,
@@ -306,11 +411,7 @@ export default function AuthPage() {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundImage:
-            "url(https://cdn.ferrari.com/cms/network/media/img/resize/65cb42c6604f1d0021785747-2024-scuderia-ferrari-sf-24-launch-desk)",
-          [theme.getColorSchemeSelector("dark")]: {
-            backgroundImage:
-              "url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQosFmsV0opjENZ-0Gw_l0VNuVb-B5i71KZAw&s)",
-          },
+            "url(https://scontent.fsgn20-1.fna.fbcdn.net/v/t1.15752-9/460598464_534420082301265_6938301985852954232_n.png?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeG37PdF0oLrKQzcFnoE1ptvqbY7IRP2WlaptjshE_ZaVi3VGqdMSXszQV29VjqKKlF3bzi6mKGA0VvKwVnR4ZRM&_nc_ohc=mm0qeprZUxMQ7kNvgGX5iTV&_nc_ht=scontent.fsgn20-1.fna&_nc_gid=AhhEhXd_XZ-VB48tNoTP19f&oh=03_Q7cD1QELVBYJq9nQMuFgkCCTsUBVMq7yuJxPfYrWu2ZuHXk9bQ&oe=6715B658)",
         })}
       />
     </CssVarsProvider>
