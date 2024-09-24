@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CssVarsProvider, extendTheme } from "@mui/joy/styles";
+import { CssVarsProvider } from "@mui/joy/styles";
 import GlobalStyles from "@mui/joy/GlobalStyles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import Box from "@mui/joy/Box";
@@ -22,7 +22,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 // import GoogleIcon from "../GoogleIcon";
 import api from "../config/axios";
 
-const customTheme = extendTheme({ defaultColorScheme: "dark" });
+// const customTheme = extendTheme({ defaultColorScheme: "dark" });
 
 export default function AuthPage() {
   // 'signin', 'signup', or 'forgotpassword'
@@ -32,17 +32,11 @@ export default function AuthPage() {
   const [email, setEmail] = React.useState("");
 
   // for first time login
-  const [userStatus, setUserStatus] = React.useState(null);
-  const [isSignUp, setIsSignUp] = React.useState(false);
+  // const [isFirstLogin, setIsFirstLogin] = React.useState(false);
+  const navigate = useNavigate();
 
   const toggleAuthMode = (mode) => {
     setAuthMode(mode);
-  };
-
-  const loginUser = (userData) => {
-    localStorage.setItem("token", userData.token);
-    localStorage.setItem("user", JSON.stringify(userData));
-    navigate("/");
   };
 
   const CompanyLogoButton = () => (
@@ -59,7 +53,6 @@ export default function AuthPage() {
     </IconButton>
   );
 
-  const navigate = useNavigate();
   // const [anchorElUser, setAnchorElUser] = React.useState(null);
 
   const handleHomeClick = () => {
@@ -69,37 +62,31 @@ export default function AuthPage() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    // let data;
-    switch (authMode) {
-      case "signin":
-        try {
-          const response = await api.post("Auth/Login", {
+
+    try {
+      switch (authMode) {
+        case "signin": {
+          const loginResponse = await api.post("api/Auth/Login", {
             email: formData.get("email"),
             password: formData.get("password"),
           });
 
-          setEmail(formData.get("email"));
-          setUserStatus(response.data.status);
-
-          if (response.data.status === "pending") {
-            // First-time login, requires OTP
-            toggleAuthMode("verifyOTP");
-          } else if (response.data.requireOTP) {
-            // Regular login that requires OTP
+          if (loginResponse.data.status === "inactive") {
+            // Silently store email and move to OTP verification
+            setEmail(formData.get("email"));
             toggleAuthMode("verifyOTP");
           } else {
-            // Regular login, no OTP required
-            loginUser(response.data);
+            // User is active, proceed with login
+            const { token } = loginResponse.data;
+            localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(loginResponse.data));
+            navigate("/");
           }
-        } catch (err) {
-          console.log(err);
-          alert(err.response?.data || "An error occurred during login");
+          break;
         }
-        break;
 
-      case "signup":
-        try {
-          await api.post("Auth/Signup", {
+        case "signup": {
+          const signupResponse = await api.post("api/Auth/Signup", {
             fullname: formData.get("fullName"),
             userName: formData.get("userName"),
             email: formData.get("email"),
@@ -110,58 +97,49 @@ export default function AuthPage() {
             address: formData.get("address"),
             terms: formData.get("terms") === "on",
           });
-          setEmail(formData.get("email"));
-          setIsSignUp(true);
-          toggleAuthMode("verifyOTP");
-        } catch (err) {
-          console.error(err);
-          alert(err.response?.data || "An error occurred during Sign Up");
+          if (signupResponse.data.status === "inactive") {
+            setEmail(formData.get("email"));
+            toggleAuthMode("verifyOTP");
+          } else {
+            toggleAuthMode("signIn");
+          }
+          break;
         }
-        break;
 
-      case "forgotpassword":
-        // Connect forgot password here
-        try {
-          await api.post("User/ForgotPassword", {
+        case "forgotpassword": {
+          await api.post("api/User/ForgotPassword", {
             email: formData.get("email"),
           });
           setEmail(formData.get("email"));
-          toggleAuthMode("signin");
-        } catch (err) {
-          console.error(err);
-          alert(err.response?.data || "An error occurred for this function");
+          toggleAuthMode("signIn");
+          break;
         }
-        break;
 
-      case "verifyOTP":
-        try {
-          await api.post("User/SubmitOTP", {
+        case "verifyOTP": {
+          const otpResponse = await api.post("api/User/SubmitOTP", {
             email: email,
             otp: formData.get("otp"),
           });
-          if (isSignUp) {
+
+          if (otpResponse.data.success) {
             alert("Email verified successfully. You can now log in.");
-            setIsSignUp(false);
             toggleAuthMode("signin");
           } else {
-            // Handle login after OTP verification
-            const loginResponse = await api.post("Auth/Login", {
-              email: email,
-              password: formData.get("password"), // You might need to store this temporarily
-            });
-            loginUser(loginResponse.data);
+            alert("OTP verification failed. Please try again.");
           }
-        } catch (err) {
-          console.error(err);
-          alert(
-            err.response?.data || "An error occurred during OTP verification"
-          );
+          break;
         }
-        break;
+
+        default:
+          throw new Error("Invalid auth mode");
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data || "An error occurred");
     }
   };
   return (
-    <CssVarsProvider theme={customTheme} disableTransitionOnChange>
+    <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
       <GlobalStyles
         styles={{
@@ -281,21 +259,6 @@ export default function AuthPage() {
                     Enter your email address and we'll send you a link to reset
                     your password.
                   </Typography>
-                )}
-                {authMode === "verifyOTP" && (
-                  <Stack sx={{ gap: 2 }}>
-                    <Typography level="body-sm">
-                      {isSignUp
-                        ? "Please enter the OTP sent to your email to complete signup."
-                        : userStatus === "pending"
-                        ? "Please enter the OTP for your first login."
-                        : "Please enter the OTP to verify your login."}
-                    </Typography>
-                    <FormControl required>
-                      <FormLabel>Enter OTP</FormLabel>
-                      <Input type="text" name="otp" />
-                    </FormControl>
-                  </Stack>
                 )}
               </Stack>
               {/* {authMode === "signin" && (
