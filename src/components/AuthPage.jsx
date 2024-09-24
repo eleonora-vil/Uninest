@@ -66,21 +66,30 @@ export default function AuthPage() {
     try {
       switch (authMode) {
         case "signin": {
-          const loginResponse = await api.post("api/Auth/Login", {
-            email: formData.get("email"),
-            password: formData.get("password"),
-          });
+          try {
+            const loginResponse = await api.post("api/Auth/Login", {
+              email: formData.get("email"),
+              password: formData.get("password"),
+            });
 
-          if (loginResponse.data.status === "inactive") {
-            // Silently store email and move to OTP verification
-            setEmail(formData.get("email"));
-            toggleAuthMode("verifyOTP");
-          } else {
-            // User is active, proceed with login
-            const { token } = loginResponse.data;
+            // If we reach here, assume login was successful
+            const { token, ...userData } = loginResponse.data;
             localStorage.setItem("token", token);
-            localStorage.setItem("user", JSON.stringify(loginResponse.data));
+            localStorage.setItem("user", JSON.stringify(userData));
             navigate("/");
+          } catch (error) {
+            if (error.response && error.response.status === 401) {
+              // This is a special case where the account exists but needs verification
+              setEmail(formData.get("email"));
+              toggleAuthMode("verifyOTP");
+            } else {
+              // Handle other errors (invalid credentials, server errors, etc.)
+              console.error("Login error:", error);
+              alert(
+                error.response?.data?.message ||
+                  "An error occurred during login. Please try again."
+              );
+            }
           }
           break;
         }
@@ -116,16 +125,23 @@ export default function AuthPage() {
         }
 
         case "verifyOTP": {
-          const otpResponse = await api.post("api/User/SubmitOTP", {
-            email: email,
-            otp: formData.get("otp"),
-          });
+          try {
+            const otpResponse = await api.post("api/User/SubmitOTP", {
+              email: email, // Use the email from state
+              otp: formData.get("otp"),
+            });
 
-          if (otpResponse.data.success) {
-            alert("Email verified successfully. You can now log in.");
-            toggleAuthMode("signin");
-          } else {
-            alert("OTP verification failed. Please try again.");
+            if (otpResponse.data.success) {
+              alert("Email verified successfully. You can now log in.");
+              toggleAuthMode("signin");
+            } else {
+              alert("OTP verification failed. Please try again.");
+            }
+          } catch (error) {
+            console.error("OTP verification error:", error);
+            alert(
+              "An error occurred during OTP verification. Please try again."
+            );
           }
           break;
         }
@@ -236,10 +252,10 @@ export default function AuthPage() {
                     ? "Verify OTP"
                     : ""}
                 </Typography>
-                {authMode !== "forgotpassword" && (
+                {authMode !== "forgotpassword" && authMode !== "verifyOTP" && (
                   <Typography level="body-sm">
                     {authMode === "signin"
-                      ? "Don't have an account yet? "
+                      ? "Don't have an account yet?"
                       : "Already have an account? "}
                     <Link
                       component="button"
@@ -258,6 +274,11 @@ export default function AuthPage() {
                   <Typography level="body-sm">
                     Enter your email address and we'll send you a link to reset
                     your password.
+                  </Typography>
+                )}
+                {authMode === "verifyOTP" && (
+                  <Typography level="body-sm" sx={{ mb: 2 }}>
+                    Enter the OTP sent to: {email}
                   </Typography>
                 )}
               </Stack>
@@ -294,11 +315,15 @@ export default function AuthPage() {
                     <Input type="text" name="userName" />
                   </FormControl>
                 )}
-                <FormControl required>
-                  <FormLabel>Email</FormLabel>
-                  <Input type="email" name="email" />
-                </FormControl>
-                {authMode !== "forgotpassword" && (
+
+                {authMode !== "verifyOTP" && (
+                  <FormControl required>
+                    <FormLabel>Email</FormLabel>
+                    <Input type="email" name="email" />
+                  </FormControl>
+                )}
+
+                {authMode !== "forgotpassword" && authMode !== "verifyOTP" && (
                   <FormControl required>
                     <FormLabel>Password</FormLabel>
                     <Input type="password" name="password" />
