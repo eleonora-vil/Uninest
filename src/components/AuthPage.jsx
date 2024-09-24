@@ -32,10 +32,17 @@ export default function AuthPage() {
   const [email, setEmail] = React.useState("");
 
   // for first time login
-  const [isFirstLogin, setIsFirstLogin] = React.useState(false);
+  const [userStatus, setUserStatus] = React.useState(null);
+  const [isSignUp, setIsSignUp] = React.useState(false);
 
   const toggleAuthMode = (mode) => {
     setAuthMode(mode);
+  };
+
+  const loginUser = (userData) => {
+    localStorage.setItem("token", userData.token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    navigate("/");
   };
 
   const CompanyLogoButton = () => (
@@ -65,32 +72,32 @@ export default function AuthPage() {
     // let data;
     switch (authMode) {
       case "signin":
-        // handle Login here
         try {
           const response = await api.post("Auth/Login", {
             email: formData.get("email"),
             password: formData.get("password"),
           });
 
-          if (response.data.requireOTP) {
-            setEmail(formData.get("email"));
-            setIsFirstLogin(true);
+          setEmail(formData.get("email"));
+          setUserStatus(response.data.status);
+
+          if (response.data.status === "pending") {
+            // First-time login, requires OTP
+            toggleAuthMode("verifyOTP");
+          } else if (response.data.requireOTP) {
+            // Regular login that requires OTP
             toggleAuthMode("verifyOTP");
           } else {
-            const { token } = response.data;
-            localStorage.setItem("token", token);
-            localStorage.setItem("user", JSON.stringify(response.data));
-            navigate("/");
+            // Regular login, no OTP required
+            loginUser(response.data);
           }
-          navigate("/");
         } catch (err) {
           console.log(err);
           alert(err.response?.data || "An error occurred during login");
         }
-
         break;
+
       case "signup":
-        // handle SignUp
         try {
           await api.post("Auth/Signup", {
             fullname: formData.get("fullName"),
@@ -103,12 +110,9 @@ export default function AuthPage() {
             address: formData.get("address"),
             terms: formData.get("terms") === "on",
           });
-          alert(
-            "Registration successful! Please sign in with your new account."
-          );
           setEmail(formData.get("email"));
-          setIsFirstLogin(true);
-          toggleAuthMode("verifyOTP"); // Redirect to signin after successful registration
+          setIsSignUp(true);
+          toggleAuthMode("verifyOTP");
         } catch (err) {
           console.error(err);
           alert(err.response?.data || "An error occurred during Sign Up");
@@ -122,8 +126,7 @@ export default function AuthPage() {
             email: formData.get("email"),
           });
           setEmail(formData.get("email"));
-          setIsFirstLogin(false);
-          toggleAuthMode("verifyOTP");
+          toggleAuthMode("signin");
         } catch (err) {
           console.error(err);
           alert(err.response?.data || "An error occurred for this function");
@@ -136,9 +139,17 @@ export default function AuthPage() {
             email: email,
             otp: formData.get("otp"),
           });
-          if (isFirstLogin) {
+          if (isSignUp) {
             alert("Email verified successfully. You can now log in.");
+            setIsSignUp(false);
             toggleAuthMode("signin");
+          } else {
+            // Handle login after OTP verification
+            const loginResponse = await api.post("Auth/Login", {
+              email: email,
+              password: formData.get("password"), // You might need to store this temporarily
+            });
+            loginUser(loginResponse.data);
           }
         } catch (err) {
           console.error(err);
@@ -270,6 +281,21 @@ export default function AuthPage() {
                     Enter your email address and we'll send you a link to reset
                     your password.
                   </Typography>
+                )}
+                {authMode === "verifyOTP" && (
+                  <Stack sx={{ gap: 2 }}>
+                    <Typography level="body-sm">
+                      {isSignUp
+                        ? "Please enter the OTP sent to your email to complete signup."
+                        : userStatus === "pending"
+                        ? "Please enter the OTP for your first login."
+                        : "Please enter the OTP to verify your login."}
+                    </Typography>
+                    <FormControl required>
+                      <FormLabel>Enter OTP</FormLabel>
+                      <Input type="text" name="otp" />
+                    </FormControl>
+                  </Stack>
                 )}
               </Stack>
               {/* {authMode === "signin" && (
