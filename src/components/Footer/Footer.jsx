@@ -101,11 +101,24 @@ const FooterComponent = () => {
           </ul>
         </Col>
 
-        <Col xs={24} md={6} className="footer-contact">
-          <MailOutlined /> <span>trogiup@uninest.com.vn</span>
+        <Col
+          xs={24}
+          md={6}
+          className="footer-contact"
+          style={{ fontSize: "18px", fontWeight: "bold" }}
+        >
+          <h4>Chăm sóc khách hàng</h4>
+          <MailOutlined style={{ fontSize: "24px", marginRight: "10px" }} />
+          <span>trogiup@uninest.com.vn</span>
           <br />
-          <PhoneOutlined /> <span>1900 1886</span>
+          <br />
+          <h4>Hotline</h4>
+          <PhoneOutlined
+            style={{ fontSize: "24px", marginRight: "10px", marginTop: "10px" }}
+          />
+          <span>1900 1886</span>
         </Col>
+
         <Col xs={24} md={6} className="footer-contact">
           <h3>CHỨNG NHẬN</h3>
           <img
