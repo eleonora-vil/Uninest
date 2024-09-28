@@ -104,7 +104,6 @@ export default function AuthPage() {
             phone: formData.get("phone"),
             gender: formData.get("gender"),
             address: formData.get("address"),
-            terms: formData.get("terms") === "on",
           });
           if (signupResponse.data.status === "inactive") {
             setEmail(formData.get("email"));
@@ -152,6 +151,15 @@ export default function AuthPage() {
     } catch (err) {
       console.error(err);
       alert(err.response?.data || "An error occurred");
+    }
+  };
+  const handleSendOTP = async () => {
+    try {
+      await api.post("api/Auth/ResendOTP", { email: email });
+      alert("OTP sent successfully. Please check your email.");
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("Failed to send OTP. Please try again.");
     }
   };
   return (
@@ -282,16 +290,6 @@ export default function AuthPage() {
                   </Typography>
                 )}
               </Stack>
-              {/* {authMode === "signin" && (
-                <Button
-                  variant="soft"
-                  color="neutral"
-                  fullWidth
-                  startDecorator={<GoogleIcon />}
-                >
-                  Continue with Google
-                </Button>
-              )} */}
             </Stack>
             {authMode === "signin" && <Divider>or</Divider>}
             <Stack sx={{ gap: 4, mt: 2 }}>
@@ -299,7 +297,12 @@ export default function AuthPage() {
                 {authMode === "verifyOTP" && (
                   <FormControl required>
                     <FormLabel>Enter OTP</FormLabel>
-                    <Input type="text" name="otp" />
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <Input type="text" name="otp" />
+                      <Button onClick={handleSendOTP}>
+                        {email ? "Resend OTP" : "Send OTP"}
+                      </Button>
+                    </Box>
                   </FormControl>
                 )}
 
@@ -366,11 +369,11 @@ export default function AuthPage() {
                         alignItems: "center",
                       }}
                     >
-                      <Checkbox
+                      {/* <Checkbox
                         size="sm"
                         label="Remember me"
                         name="persistent"
-                      />
+                      /> */}
                       <Link
                         level="title-sm"
                         component="button"
@@ -380,13 +383,7 @@ export default function AuthPage() {
                       </Link>
                     </Box>
                   )}
-                  {authMode === "signup" && (
-                    <Checkbox
-                      size="sm"
-                      label="I agree to the terms and conditions"
-                      name="terms"
-                    />
-                  )}
+
                   <Button type="submit" fullWidth>
                     {authMode === "signin"
                       ? "Sign in"
