@@ -1,21 +1,11 @@
 import React from "react";
-import {
-  Layout,
-  Menu,
-  Avatar,
-  Button,
-  Input,
-  Carousel,
-  Card,
-  Row,
-  Col,
-} from "antd";
-import { UserOutlined, SearchOutlined, HeartOutlined } from "@ant-design/icons";
+import { Layout, Carousel, Card, Row, Col } from "antd";
+import { HeartOutlined } from "@ant-design/icons";
 import AppHeader from "./Header/Header";
+import FooterComponent from "./Footer/Footer";
 // import "./App.css"; // Add your custom styles here
 
-const { Header, Content, Footer } = Layout;
-const { Search } = Input;
+const { Content } = Layout;
 
 const Homepage = () => {
   const renderCard = () => (
@@ -103,27 +93,7 @@ const Homepage = () => {
           </Carousel>
         </div>
       </Content>
-
-      <Footer>
-        <Row>
-          <Col span={6}>
-            <p>Hướng dẫn</p>
-            <p>Báo giá & hỗ trợ</p>
-          </Col>
-          <Col span={6}>
-            <p>Quy định</p>
-            <p>Điều khoản</p>
-          </Col>
-          <Col span={6}>
-            <p>Chăm sóc khách hàng</p>
-            <p>trogiup@uninest.com.vn</p>
-          </Col>
-          <Col span={6}>
-            <p>Liên kết</p>
-            <p>Zalo, Facebook</p>
-          </Col>
-        </Row>
-      </Footer>
+      <FooterComponent />
     </Layout>
   );
 };
