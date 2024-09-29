@@ -88,14 +88,23 @@ export default function HomePage() {
   const renderCards = (data) => {
     return data.map((item, index) => (
       <Card key={index} sx={{ minWidth: 200, marginRight: 2, borderRadius: 5 }}>
-        <CardMedia
-          component="img"
-          height="200"
-          image={item.imageUrl}
-          alt={item.title}
-        />
+        {item.homeImages && item.homeImages.length > 0 ? (
+          <CardMedia
+            component="img"
+            height="200"
+            image={item.homeImages[0].image?.imageUrl}
+            alt={item.name}
+          />
+        ) : (
+          <CardMedia
+            component="img"
+            height="200"
+            image="/path/to/default/image.jpg"
+            alt="No image available"
+          />
+        )}
         <CardContent>
-          <Typography variant="h2">{item.title}</Typography>
+          <Typography variant="h2">{item.name}</Typography>
           <Typography variant="h10">{item.description}</Typography>
           <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
             <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
