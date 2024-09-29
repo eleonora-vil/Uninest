@@ -19,6 +19,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import api from "../config/axios";
+import Uninest from "../assets/Uninest.png";
 
 // const customTheme = extendTheme({ defaultColorScheme: "dark" });
 
@@ -41,7 +42,7 @@ export default function AuthPage() {
   const CompanyLogoButton = () => (
     <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
       <img
-        src="https://scontent.fsgn20-1.fna.fbcdn.net/v/t39.30808-6/460535538_122105294522523904_2461728936276430116_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=sOcqU-oVd_gQ7kNvgE-YNu6&_nc_ht=scontent.fsgn20-1.fna&_nc_gid=AiovkpM2EY65PFsglqEFYdO&oh=00_AYAWBfXjRqpBiDpTpEx49F5L4bxesCZ7aSSWsSkj__ZP-g&oe=66F2EF86"
+        src={Uninest}
         alt="Company Logo"
         style={{
           width: 64,

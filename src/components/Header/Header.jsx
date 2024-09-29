@@ -12,6 +12,8 @@ import {
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
+import IconButton from "@mui/joy/IconButton";
+import Uninest from "../../assets/Uninest.png";
 
 const { Header } = Layout;
 // const { SubMenu } = Menu;
@@ -124,6 +126,10 @@ const AppHeader = () => {
     </Menu>
   );
 
+  const handleHomeClick = () => {
+    navigate("/");
+  };
+
   return (
     <Header
       className="header"
@@ -136,9 +142,18 @@ const AppHeader = () => {
         justifyContent: "space-between",
       }}
     >
-      <div className="logo">
-        <img src="/logo.png" alt="UNINEST" style={{ height: "32px" }} />
-      </div>
+      <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
+        <img
+          src={Uninest}
+          alt="Company Logo"
+          style={{
+            width: 64,
+            height: 64,
+            objectFit: "contain",
+          }}
+          onClick={handleHomeClick}
+        />
+      </IconButton>
 
       <Menu
         onClick={onClick}
@@ -171,8 +186,9 @@ const AppHeader = () => {
             type="text"
             icon={<UserOutlined />}
             onClick={() => navigate("/auth")}
+            size="large"
           >
-            Sign In / Sign Up
+            Đăng nhập / Đăng kí
           </Button>
         </Space>
       )}

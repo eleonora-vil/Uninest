@@ -5,9 +5,10 @@ import {
   MailOutlined,
   PhoneOutlined,
   FacebookOutlined,
-  GoogleOutlined,
+  InstagramOutlined,
 } from "@ant-design/icons";
-// import "./FooterComponent.css"; // We'll use this for custom styling.
+import "./FooterComponent.css"; // We'll use this for custom styling.
+import bocongthuong from "../../assets/bocongthuong.png";
 
 const { Footer } = Layout;
 
@@ -15,21 +16,21 @@ const FooterComponent = () => {
   return (
     <Footer className="footer">
       <Row justify="space-between" align="middle">
-        <Col xs={24} md={6} className="footer-logo-qrcode">
+        <Col xs={14} md={6} className="footer-logo-qrcode">
           <img
-            src="https://picsum.photos/200"
+            src="https://picsum.photos/140"
             alt="Logo"
             className="logo"
             style={{ marginRight: "10px" }}
           />
           <img
-            src="https://picsum.photos/200"
+            src="https://picsum.photos/140"
             alt="QR Code"
             className="qrcode"
           />
         </Col>
 
-        <Col xs={24} md={4}>
+        <Col xs={14} md={4}>
           <h3>HƯỚNG DẪN</h3>
           <ul className="footer-links">
             <li>
@@ -59,7 +60,7 @@ const FooterComponent = () => {
           </ul>
         </Col>
 
-        <Col xs={24} md={6}>
+        <Col xs={14} md={5}>
           <h3>QUY ĐỊNH</h3>
           <ul className="footer-links">
             <li>
@@ -102,53 +103,59 @@ const FooterComponent = () => {
         </Col>
 
         <Col
-          xs={24}
+          xs={14}
           md={6}
           className="footer-contact"
           style={{ fontSize: "18px", fontWeight: "bold" }}
         >
-          <h4>Chăm sóc khách hàng</h4>
-          <MailOutlined style={{ fontSize: "24px", marginRight: "10px" }} />
+          <span>Chăm sóc khách hàng</span>
+          <br />
+          <MailOutlined
+            style={{ fontSize: "14px", marginRight: "10px", marginTop: "10px" }}
+            size="lagre"
+          />
           <span>trogiup@uninest.com.vn</span>
           <br />
           <br />
-          <h4>Hotline</h4>
+          <span>Hotline</span>
+          <br />
           <PhoneOutlined
-            style={{ fontSize: "24px", marginRight: "10px", marginTop: "10px" }}
+            style={{ fontSize: "14px", marginRight: "10px", marginTop: "10px" }}
+            size="large"
           />
           <span>1900 1886</span>
         </Col>
 
-        <Col xs={24} md={6} className="footer-contact">
+        <Col xs={14} md={6} className="footer-contact">
           <h3>CHỨNG NHẬN</h3>
           <img
-            src="https://pos.nvncdn.com/b47809-47548/art/artCT/20190711_9MTXY8s2VKUAvSRYYKpweJkb.jpg"
+            src={bocongthuong}
             alt="Chứng nhận"
             style={{ marginLeft: "0px", width: "150px" }} // Adjust the image width as necessary
           />
         </Col>
-        <Col xs={24} md={6} className="footer-social">
+        <Col xs={14} md={6} className="footer-social">
           <h3>LIÊN KẾT</h3>
 
           <Button
             type="link"
             shape="circle"
-            icon={<FacebookOutlined style={{ fontSize: "24px" }} />}
-            href="https://www.facebook.com"
+            icon={<FacebookOutlined style={{ fontSize: "30px" }} />}
+            href="https://www.facebook.com/uninest.findyourhome"
             target="_blank"
-            style={{ marginRight: "10px" }}
+            style={{ marginRight: "15px" }}
           />
 
           <Button
             type="link"
             shape="circle"
-            icon={<GoogleOutlined style={{ fontSize: "24px" }} />}
-            href="https://www.google.com"
+            icon={<InstagramOutlined style={{ fontSize: "30px" }} />}
+            href="https://www.instagram.com/uninest.inspirated?igsh=MXdiajBkb2kwanAzeg=="
             target="_blank"
-            style={{ marginRight: "10px" }}
+            style={{ marginRight: "15px" }}
           />
 
-          <Button
+          {/* <Button
             type="link"
             shape="circle"
             href="https://zalo.me"
@@ -161,11 +168,11 @@ const FooterComponent = () => {
             }} // adjust size as needed
           >
             <img
-              src="https://cdn.haitrieu.com/wp-content/uploads/2022/01/Logo-Zalo-Arc.png"
+              src="https://cdn.haitrieu.com/wp-content/uploads/1422/01/Logo-Zalo-Arc.png"
               alt="Zalo"
-              style={{ width: "24px" }}
+              style={{ width: "14px" }}
             />
-          </Button>
+          </Button> */}
         </Col>
       </Row>
     </Footer>

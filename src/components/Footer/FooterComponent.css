@@ -1,0 +1,21 @@
+.footer-section {
+    font-size: 18px; /* Increased base font size */
+  }
+  .footer-section h3 {
+    font-size: 24px; /* Larger heading size */
+    margin-bottom: 20px;
+  }
+  .footer-links {
+    padding-left: 0;
+    list-style-type: none;
+  }
+  .footer-links li {
+    margin-bottom: 15px; /* Increased spacing between list items */
+  }
+  .footer-links a {
+    text-decoration: none;
+    color: #333;
+  }
+  .footer-links a:hover {
+    text-decoration: underline;
+  }
