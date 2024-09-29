@@ -4,7 +4,6 @@ import GlobalStyles from "@mui/joy/GlobalStyles";
 import CssBaseline from "@mui/joy/CssBaseline";
 import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
-import Checkbox from "@mui/joy/Checkbox";
 import Divider from "@mui/joy/Divider";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
@@ -16,10 +15,9 @@ import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import Stack from "@mui/joy/Stack";
 import { useNavigate } from "react-router-dom";
-// import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
-// import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-// import GoogleIcon from "../GoogleIcon";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import api from "../config/axios";
 
 // const customTheme = extendTheme({ defaultColorScheme: "dark" });
@@ -27,14 +25,15 @@ import api from "../config/axios";
 export default function AuthPage() {
   // 'signin', 'signup', or 'forgotpassword'
   const [authMode, setAuthMode] = React.useState("signin");
+  const [showPassword, setShowPassword] = React.useState(false);
 
-  //
   const [email, setEmail] = React.useState("");
 
-  // for first time login
-  // const [isFirstLogin, setIsFirstLogin] = React.useState(false);
   const navigate = useNavigate();
 
+  const handleTogglePassword = () => {
+    setShowPassword((prev) => !prev);
+  };
   const toggleAuthMode = (mode) => {
     setAuthMode(mode);
   };
@@ -329,7 +328,19 @@ export default function AuthPage() {
                 {authMode !== "forgotpassword" && authMode !== "verifyOTP" && (
                   <FormControl required>
                     <FormLabel>Password</FormLabel>
-                    <Input type="password" name="password" />
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      endDecorator={
+                        <IconButton onClick={handleTogglePassword}>
+                          {showPassword ? (
+                            <VisibilityOffIcon />
+                          ) : (
+                            <VisibilityIcon />
+                          )}
+                        </IconButton>
+                      }
+                    />
                   </FormControl>
                 )}
                 {authMode === "signup" && (
