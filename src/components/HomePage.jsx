@@ -19,80 +19,257 @@ import { useNavigate } from "react-router-dom";
 // import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 // import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-export default function HomePage(){
-    const CompanyLogoButton = () => (
-        <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
-          <img
-            src="https://scontent.fsgn20-1.fna.fbcdn.net/v/t39.30808-6/460535538_122105294522523904_2461728936276430116_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=sOcqU-oVd_gQ7kNvgE-YNu6&_nc_ht=scontent.fsgn20-1.fna&_nc_gid=AiovkpM2EY65PFsglqEFYdO&oh=00_AYAWBfXjRqpBiDpTpEx49F5L4bxesCZ7aSSWsSkj__ZP-g&oe=66F2EF86"
-            alt="Company Logo"
-            style={{
-              width: 64,
-              height: 64,
-              objectFit: "contain",
-            }}
-          />
-        </IconButton>
-      );
-      
+export default function HomePage() {
+  const RentingLogoButton = () => (
+    <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
+      <img
+        src="https://cdn-icons-png.flaticon.com/128/4820/4820436.png"
+        alt="Renting Logo"
+        style={{
+          width: 64,
+          height: 64,
+          objectFit: "contain",
+          justifyContent: "left",
+        }}
+      />
+    </IconButton>
+  );
+  const CleaningLogoButton = () => (
+    <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
+      <img
+        src="https://cdn-icons-png.flaticon.com/128/4673/4673099.png"
+        alt="Cleaning Logo"
+        style={{
+          width: 64,
+          height: 64,
+          objectFit: "contain",
+        }}
+      />
+    </IconButton>
+  );
+  const MovingLogoButton = () => (
+    <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
+      <img
+        src="https://cdn-icons-png.flaticon.com/128/15288/15288881.png"
+        alt="Moving Logo"
+        style={{
+          width: 64,
+          height: 64,
+          objectFit: "contain",
+        }}
+      />
+    </IconButton>
+  );
   const handleHomeClick = () => {
     navigate("/");
   };
-      return (
-        <CssVarsProvider disableTransitionOnChange>
-            <CssBaseline>
-                <GlobalStyles
-                    styles={{
-                        ":root": {
-                          "--Form-maxWidth": "800px",
-                          "--Transition-duration": "0.4s",
-                        },
-                      }}
-                />
-                <Box
-                    sx={(theme) => ({
-                    width: { xs: "100%", md: "50vw" },
-                    transition: "width var(--Transition-duration)",
-                    transitionDelay: "calc(var(--Transition-duration) + 0.1s)",
-                    position: "relative",
-                    zIndex: 1,
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    backdropFilter: "blur(12px)",
-                    backgroundColor: "rgba(255 255 255 / 0.2)",
-                    [theme.getColorSchemeSelector("dark")]: {
-                        backgroundColor: "rgba(19 19 24 / 0.4)",
-                    },
-                    })}
+  return (
+    <CssVarsProvider disableTransitionOnChange>
+      <CssBaseline>
+        <GlobalStyles
+          styles={{
+            ":root": {
+              "--Form-maxWidth": "100%",
+              "--Transition-duration": "0.4s",
+            },
+          }}
+        />
+        <Box
+          sx={{
+            backgroundColor: "grey", // This sets the background color to grey
+            height: "100%", // This ensures the grey background covers the full viewport height
+          }}
+        >
+          <Box
+            sx={() => ({
+              height: "50%",
+              width: "100%",
+              position: "fixed",
+              right: 0,
+              top: 0,
+              bottom: 0,
+              transition:
+                "background-image var(--Transition-duration), left var(--Transition-duration) !important",
+              transitionDelay: "calc(var(--Transition-duration) + 0.1s)",
+              backgroundColor: "background.level1",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              backgroundImage:
+                "url(https://images.pexels.com/photos/2988860/pexels-photo-2988860.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)",
+            })}
+          >
+            {/* Centered text */}
+            <Box
+              sx={{
+                position: "absolute",
+                top: "35%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                color: "#fff",
+                fontSize: "60px",
+                textAlign: "center",
+              }}
+            >
+              <Typography
+                variant="h2"
+                component="div"
+                sx={{ fontSize: "70%", color: "#fff" }}
+              >
+                Cùng tìm kiếm một căn trọ hoàn hảo cho bạn với UNINEST
+              </Typography>
+            </Box>
+
+            {/* White box split into two sections */}
+            <Box
+              sx={{
+                position: "absolute",
+                left: "50%",
+                bottom: "5%",
+                transform: "translateX(-50%)",
+                width: "45%", // Adjust the width of the white box
+                height: "35%",
+                backgroundColor: "#fff",
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+                display: "flex", // Flexbox for splitting into two parts
+                alignItems: "center",
+                justifyContent: "space-between", // Evenly space between sections
+                padding: "20px", // Padding inside the box
+              }}
+            >
+              {/* Left Section: Single Icon with Text */}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "left",
+                  justifyContent: "space-evenly",
+                  width: "35%", // Adjust width for the left section
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "90%",
+                    color: "#343131",
+                    marginBottom: 2,
+                    textAlign: "left",
+                    fontWeight: "bold",
+                  }}
                 >
-                    <Box
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            minHeight: "100dvh",
-                            width: "100%",
-                            px: 2,
-                        }}
-                        >
-                            <Box
-                                component="header"
-                                sx={{ py: 3, display: "flex", justifyContent: "space-between" }}
-                            >
-                                <Box sx={{ gap: 2, display: "flex", alignItems: "center" }}>
-                                {/* <CompanyLogoButton /> */}
-                                    <Button
-                                        variant="plain"
-                                        startDecorator={<CompanyLogoButton />}
-                                        size="lg"
-                                        color="neutral"
-                                        onClick={handleHomeClick}
-                                    >
-                                        UNINEST
-                                    </Button>
-                                </Box>
-                            </Box>
-                    </Box>
+                  Tìm phòng trọ
+                </Typography>
+                <Button
+                  variant="plain"
+                  startDecorator={<RentingLogoButton />}
+                  size="lg"
+                  color="neutral"
+                  onClick={handleHomeClick}
+                >
+                  Cho thuê
+                </Button>
+              </Box>
+
+              {/* Right Section: Two Icons with Text */}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  width: "50%", // Adjust width for the right section
+                  gap: 2,
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "90%",
+                    color: "#343131",
+                    textAlign: "left",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Dịch vụ bên thứ ba
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Button
+                      variant="plain"
+                      startDecorator={<CleaningLogoButton />} // Replace with your actual icon or logo
+                      size="lg"
+                      color="neutral"
+                      onClick={handleHomeClick}
+                    >
+                      Dọn nhà
+                    </Button>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Button
+                      variant="plain"
+                      startDecorator={<MovingLogoButton />} // Replace with your actual icon or logo
+                      size="lg"
+                      color="neutral"
+                      onClick={handleHomeClick}
+                    >
+                      Chuyển nhà
+                    </Button>
+                  </Box>
                 </Box>
-            </CssBaseline>
-        </CssVarsProvider>
-      );
+              </Box>
+            </Box>
+          </Box>
+          <Box
+            sx={{
+              position: "absolute",
+              left: "50%",
+              bottom: "5%",
+              transform: "translateX(-50%)",
+              width: "45%", // Adjust the width of the white box
+              height: "35%",
+              backgroundColor: "#fff",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+              display: "flex", // Flexbox for splitting into two parts
+              alignItems: "center",
+              justifyContent: "space-between", // Evenly space between sections
+              padding: "20px", // Padding inside the box
+            }}
+          ></Box>
+          <Box
+            sx={{
+              position: "absolute",
+              left: "50%",
+              bottom: "5%",
+              transform: "translateX(-50%)",
+              width: "45%", // Adjust the width of the white box
+              height: "35%",
+              backgroundColor: "#fff",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+              display: "flex", // Flexbox for splitting into two parts
+              alignItems: "center",
+              justifyContent: "space-between", // Evenly space between sections
+              padding: "20px", // Padding inside the box
+            }}
+          ></Box>
+        </Box>
+      </CssBaseline>
+    </CssVarsProvider>
+  );
 }
