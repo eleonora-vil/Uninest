@@ -6,12 +6,41 @@ import Box from "@mui/joy/Box";
 import Button from "@mui/joy/Button";
 import IconButton from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
+import Card from "@mui/joy/Card";
+import CardContent from "@mui/joy/CardContent";
+import { CardMedia } from "@mui/material";
+import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Time Icon
+import LocationOnIcon from "@mui/icons-material/LocationOn"; // Location Icon
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useNavigate } from "react-router-dom";
 import AppHeader from "./Header/Header";
 import FooterComponent from "./Footer/Footer";
-
+import api from "../config/axios";
 export default function HomePage() {
   const navigate = useNavigate();
+  const [cardData, setCardData] = React.useState([]); // Store house data
+  const [loading, setLoading] = React.useState(true); // Handle loading state
+  const [error, setError] = React.useState(null); // Handle errors
+
+  const handleHomeClick = () => {
+    navigate("/");
+  };
+
+  React.useEffect(() => {
+    // Fetch data from API when the component mounts
+    const fetchData = async () => {
+      try {
+        const response = await api.get("api/Home/GetAll"); // Adjust endpoint
+        setCardData(response.data); // Store the data
+      } catch (error) {
+        setError(error.message); // Handle error
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const RentingLogoButton = () => (
     <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
@@ -56,9 +85,43 @@ export default function HomePage() {
     </IconButton>
   );
 
-  const handleHomeClick = () => {
-    navigate("/");
+  const renderCards = (data) => {
+    return data.map((item, index) => (
+      <Card key={index} sx={{ minWidth: 200, marginRight: 2, borderRadius: 5 }}>
+        <CardMedia
+          component="img"
+          height="200"
+          image={item.imageUrl}
+          alt={item.title}
+        />
+        <CardContent>
+          <Typography variant="h2">{item.title}</Typography>
+          <Typography variant="h10">{item.description}</Typography>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+            <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
+            <Typography variant="body2" color="text.secondary">
+              {item.price}
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+            <AccessTimeIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
+            <Typography variant="body2" color="text.secondary">
+              {item.postTime}
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+            <LocationOnIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
+            <Typography variant="body2" color="text.secondary">
+              {item.postPlace}
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
+    ));
   };
+
+  if (loading) return <p>Loading...</p>; // Display loading message
+  if (error) return <p>Error: {error}</p>; // Display error message
 
   return (
     <CssVarsProvider disableTransitionOnChange>
@@ -206,6 +269,7 @@ export default function HomePage() {
             </Box>
           </Box>
 
+          {/* Existing Main Content */}
           <Box
             sx={{
               mt: "20vh",
@@ -216,6 +280,7 @@ export default function HomePage() {
               p: 4,
             }}
           >
+            {/* First Box with Scrollable Cards */}
             <Box
               sx={{
                 width: { xs: "90%", sm: "80%", md: "60%", lg: "45%" },
@@ -223,15 +288,15 @@ export default function HomePage() {
                 bgcolor: "#fff",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 p: 3,
+                display: "flex",
+                overflowX: "auto",
+                gap: 2,
               }}
             >
-              {/* Content for the second box */}
-              <Typography variant="h6">Additional Information Box 1</Typography>
-              <Typography>
-                This box can contain more information or features.
-              </Typography>
+              {renderCards(cardData)}
             </Box>
 
+            {/* Second Box with Scrollable Cards */}
             <Box
               sx={{
                 width: { xs: "90%", sm: "80%", md: "60%", lg: "45%" },
@@ -239,13 +304,12 @@ export default function HomePage() {
                 bgcolor: "#fff",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 p: 3,
+                display: "flex",
+                overflowX: "auto",
+                gap: 2,
               }}
             >
-              {/* Content for the third box */}
-              <Typography variant="h6">Additional Information Box 2</Typography>
-              <Typography>
-                This box can contain even more information or features.
-              </Typography>
+              {renderCards(cardData)}
             </Box>
           </Box>
         </Box>
