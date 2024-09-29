@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { StyledEngineProvider } from "@mui/joy/styles";
-import AuthPage from "./components/AuthPage";
-// import LandingPage from "./pages/LandingPage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AuthPage from "./components/AuthPage";
 import Homepage from "./components/Homepage";
+import PropertyPage from "./components/PropertyPage";
 
 const App = () => {
   return (
@@ -14,6 +14,7 @@ const App = () => {
           {/* <Route path="/homepage" element={<LandingPage />} /> */}
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/" element={<Homepage />} />
+          <Route path="/property" element={<PropertyPage />} />
         </Routes>
       </Router>
     </StyledEngineProvider>

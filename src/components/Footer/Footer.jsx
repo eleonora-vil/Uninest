@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons";
 import "./FooterComponent.css"; // We'll use this for custom styling.
 import bocongthuong from "../../assets/bocongthuong.png";
+import Uninest from "../../assets/Uninest.png";
 
 const { Footer } = Layout;
 
@@ -18,10 +19,15 @@ const FooterComponent = () => {
       <Row justify="space-between" align="middle">
         <Col xs={14} md={6} className="footer-logo-qrcode">
           <img
-            src="https://picsum.photos/140"
+            src={Uninest}
             alt="Logo"
             className="logo"
-            style={{ marginRight: "10px" }}
+            style={{
+              marginRight: "10px",
+              width: "auto",
+              height: "180px",
+              objectFit: "contain",
+            }}
           />
           <img
             src="https://picsum.photos/140"
