@@ -168,7 +168,7 @@ const AppHeader = () => {
       ) : (
         <Space>
           <Button
-            type="primary"
+            type="text"
             icon={<UserOutlined />}
             onClick={() => navigate("/auth")}
           >

@@ -262,7 +262,7 @@ export default function AuthPage() {
                 {authMode !== "forgotpassword" && authMode !== "verifyOTP" && (
                   <Typography level="body-sm">
                     {authMode === "signin"
-                      ? "Don't have an account yet?"
+                      ? "Don't have an account yet? "
                       : "Already have an account? "}
                     <Link
                       component="button"
