@@ -79,11 +79,24 @@ export default function AuthPage() {
             navigate("/");
           } catch (error) {
             if (error.response && error.response.status === 401) {
-              // This is a special case where the account exists but needs verification
-              setEmail(formData.get("email"));
-              toggleAuthMode("verifyOTP");
+              // Check the specific error message or code from the backend
+              const errorMessage = error.response.data.message;
+              if (
+                errorMessage ===
+                "Please verify your email. An OTP has been sent to your email."
+              ) {
+                setEmail(formData.get("email"));
+                toggleAuthMode("verifyOTP");
+              } else if (errorMessage === "Invalid password.") {
+                alert("Invalid password. Please try again.");
+              } else if (errorMessage === "Invalid email.") {
+                alert("Invalid email. Please try again.");
+              } else {
+                // Handle other types of 401 errors
+                alert("Authentication failed. Please try again.");
+              }
             } else {
-              // Handle other errors (invalid credentials, server errors, etc.)
+              // Handle other errors (server errors, network issues, etc.)
               console.error("Login error:", error);
               alert(
                 error.response?.data?.message ||
