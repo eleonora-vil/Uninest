@@ -54,16 +54,23 @@ const PropertyPage = () => {
 
   const images = [
     "https://upload.wikimedia.org/wikipedia/commons/3/3d/Random_House.jpg",
-    "/path/to/image2.jpg",
-    "/path/to/image3.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/3/3d/Random_House.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/3/3d/Random_House.jpg",
     // Add all your image URLs here
   ];
 
   return (
-    <Layout>
+    <Layout
+      style={{
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        padding: 0,
+        overflow: "hidden",
+      }}
+    >
       <AppHeader />
-
-      <div style={{ padding: "20px" }}>
+      <div style={{ padding: "20px", width: "100%", height: "100%" }}>
         {/* Breadcrumb */}
         <Row>
           <Col span={24}>
@@ -79,6 +86,7 @@ const PropertyPage = () => {
               {images.map((src, index) => (
                 <div key={index}>
                   <Image
+                    height={"25%"}
                     width={"100%"}
                     src={src}
                     alt={`Property Image ${index + 1}`}

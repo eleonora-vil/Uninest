@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import AppHeader from "./Header/Header";
 import FooterComponent from "./Footer/Footer";
 import api from "../config/axios";
+import { Link } from "react-router-dom";
 export default function HomePage() {
   const navigate = useNavigate();
   const [cardData, setCardData] = React.useState([]); // Store house data
@@ -104,7 +105,12 @@ export default function HomePage() {
           />
         )}
         <CardContent>
-          <Typography variant="h2">{item.name}</Typography>
+          <Link
+            to={`/property`}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <Typography variant="h2">{item.name}</Typography>
+          </Link>
           <Typography variant="h10">{item.description}</Typography>
           <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
             <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
@@ -158,6 +164,7 @@ export default function HomePage() {
             display: "flex",
             flexDirection: "column",
             bgcolor: "background.level1",
+            overflow: "hidden",
           }}
         >
           <Box
@@ -293,7 +300,7 @@ export default function HomePage() {
             <Box
               sx={{
                 width: { xs: "90%", sm: "80%", md: "60%", lg: "45%" },
-                height: "350px",
+                height: "100%",
                 bgcolor: "#fff",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 p: 3,
@@ -309,7 +316,7 @@ export default function HomePage() {
             <Box
               sx={{
                 width: { xs: "90%", sm: "80%", md: "60%", lg: "45%" },
-                height: "350px",
+                height: "100%",
                 bgcolor: "#fff",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 p: 3,
