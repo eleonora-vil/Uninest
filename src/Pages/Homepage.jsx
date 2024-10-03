@@ -9,12 +9,12 @@ import Typography from "@mui/joy/Typography";
 import Card from "@mui/joy/Card";
 import CardContent from "@mui/joy/CardContent";
 import { CardMedia } from "@mui/material";
-import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Time Icon
-import LocationOnIcon from "@mui/icons-material/LocationOn"; // Location Icon
+// import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Time Icon
+// import LocationOnIcon from "@mui/icons-material/LocationOn"; // Location Icon
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useNavigate } from "react-router-dom";
-import AppHeader from "./Header/Header";
-import FooterComponent from "./Footer/Footer";
+import AppHeader from "../components/Header/Header";
+import FooterComponent from "../components/Footer/Footer";
 import api from "../config/axios";
 import { Link } from "react-router-dom";
 export default function HomePage() {
@@ -87,51 +87,53 @@ export default function HomePage() {
   );
 
   const renderCards = (data) => {
-    return data.map((item, index) => (
-      <Card key={index} sx={{ minWidth: 200, marginRight: 2, borderRadius: 5 }}>
-        {item.homeImages && item.homeImages.length > 0 ? (
-          <CardMedia
-            component="img"
-            height="200"
-            image={item.homeImages[0].image?.imageUrl}
-            alt={item.name}
-          />
-        ) : (
-          <CardMedia
-            component="img"
-            height="200"
-            image="/path/to/default/image.jpg"
-            alt="No image available"
-          />
-        )}
-        <CardContent>
-          <Link
-            to={`/property`}
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
+    return data.map((item) => (
+      <Link
+        key={item.homeId}
+        to={`/property/${item.homeId}`}
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <Card sx={{ minWidth: 200, marginRight: 2, borderRadius: 5 }}>
+          {item.homeImages && item.homeImages.length > 0 ? (
+            <CardMedia
+              component="img"
+              height="200"
+              image={item.homeImages[0].image?.imageUrl}
+              alt={item.name}
+            />
+          ) : (
+            <CardMedia
+              component="img"
+              height="200"
+              image="/path/to/default/image.jpg"
+              alt="No image available"
+            />
+          )}
+          <CardContent>
             <Typography variant="h2">{item.name}</Typography>
-          </Link>
-          <Typography variant="h10">{item.description}</Typography>
-          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-            <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
-            <Typography variant="body2" color="text.secondary">
-              {item.price}
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-            <AccessTimeIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
-            <Typography variant="body2" color="text.secondary">
-              {item.postTime}
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-            <LocationOnIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
-            <Typography variant="body2" color="text.secondary">
-              {item.postPlace}
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
+            <Typography variant="h10">{item.description}</Typography>
+            <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+              <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
+              <Typography variant="body2" color="text.secondary">
+                {item.price}
+              </Typography>
+            </Box>
+            {/* Removed postTime and postPlace as they're not in the API response */}
+            {/* <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+          <AccessTimeIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
+          <Typography variant="body2" color="text.secondary">
+            {item.postTime}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+          <LocationOnIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
+          <Typography variant="body2" color="text.secondary">
+            {item.postPlace}
+          </Typography>
+        </Box> */}
+          </CardContent>
+        </Card>
+      </Link>
     ));
   };
 

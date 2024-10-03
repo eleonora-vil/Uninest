@@ -199,6 +199,7 @@ const AppHeader = () => {
         style={{ marginLeft: "16px" }}
         danger
         size="large"
+        onClick={() => navigate("/posting")}
       >
         Đăng tin
       </Button>
