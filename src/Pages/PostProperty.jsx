@@ -1,11 +1,23 @@
 import React from "react";
-import { Form, Input, Select, Button, Upload, Col, Row, Radio } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Button,
+  Upload,
+  Col,
+  Row,
+  Radio,
+  Typography,
+  Breadcrumb,
+} from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import "../components/Style/PostProperty.css";
 import AppHeader from "../components/Header/Header";
 import FooterComponent from "../components/Footer/Footer";
 
 const { Option } = Select;
+const { Text } = Typography;
 
 const PostProperty = () => {
   return (
@@ -13,6 +25,10 @@ const PostProperty = () => {
       <AppHeader />
       <div className="content-wrapper">
         <div className="form-container">
+          <Breadcrumb style={{ margin: "16px 0", paddingBottom: "15px" }}>
+            <Breadcrumb.Item>Trang chủ</Breadcrumb.Item>
+            <Breadcrumb.Item>Đăng tin</Breadcrumb.Item>
+          </Breadcrumb>
           <Form layout="vertical">
             <Row gutter={24}>
               <Col span={8}>
