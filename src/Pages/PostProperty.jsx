@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Form,
   Input,
@@ -10,6 +10,7 @@ import {
   Radio,
   Typography,
   Breadcrumb,
+  message,
 } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import "../components/Style/PostProperty.css";
@@ -20,6 +21,43 @@ const { Option } = Select;
 const { Text } = Typography;
 
 const PostProperty = () => {
+  const [fileList, setFileList] = useState([]);
+
+  const handleUploadChange = ({ fileList }) => {
+    setFileList(fileList);
+  };
+
+  const onFinish = async (values) => {
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("price", values.price);
+    formData.append("size", values.size);
+    formData.append("description", values.description);
+    formData.append("bathroom", values.bathroom);
+    formData.append("bedrooms", values.bedrooms);
+    formData.append("locationId", values.locationId);
+    formData.append("utilitiesId", values.utilitiesId);
+
+    fileList.forEach((file) => {
+      formData.append("images", file.originFileObj);
+    });
+
+    try {
+      const response = await fetch("/api/Home/CreateHome", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        message.success("Home created successfully!");
+      } else {
+        message.error("Failed to create home.");
+      }
+    } catch (error) {
+      message.error(`Error: ${error.message}`);
+    }
+  };
+
   return (
     <div className="page-container">
       <AppHeader />
@@ -29,7 +67,7 @@ const PostProperty = () => {
             <Breadcrumb.Item>Trang chủ</Breadcrumb.Item>
             <Breadcrumb.Item>Đăng tin</Breadcrumb.Item>
           </Breadcrumb>
-          <Form layout="vertical">
+          <Form layout="vertical" onFinish={onFinish}>
             <Row gutter={24}>
               <Col span={8}>
                 <Form.Item
@@ -39,10 +77,9 @@ const PostProperty = () => {
                   <Upload.Dragger
                     name="image"
                     accept=".jpg,.jpeg,.png,.gif"
-                    customRequest={(options) => {
-                      console.log(options.file);
-                      // Handle the uploaded file here
-                    }}
+                    fileList={fileList}
+                    onChange={handleUploadChange}
+                    beforeUpload={() => false} // Prevent automatic upload
                     style={{
                       width: "100%",
                       height: "300px",
@@ -76,6 +113,7 @@ const PostProperty = () => {
                       Ngày duy trì tin đăng
                     </span>
                   }
+                  name="duration"
                   style={{ marginBottom: "24px" }}
                 >
                   <Input
@@ -92,6 +130,7 @@ const PostProperty = () => {
                       Danh Mục Tin Đăng
                     </span>
                   }
+                  name="category"
                   required
                   style={{ marginBottom: "24px" }}
                 >
@@ -107,6 +146,7 @@ const PostProperty = () => {
                       Địa chỉ BĐS
                     </span>
                   }
+                  name="address"
                   required
                   style={{ marginBottom: "24px" }}
                 >
@@ -123,6 +163,7 @@ const PostProperty = () => {
                       Thông tin khác
                     </span>
                   }
+                  name="additionalInfo"
                   style={{ marginBottom: "24px" }}
                 >
                   <Input placeholder="Tình trạng nội thất" />
@@ -139,13 +180,15 @@ const PostProperty = () => {
                 >
                   <Input
                     placeholder="Diện tích"
+                    name="size"
                     style={{ marginBottom: "16px" }}
                   />
                   <Input
                     placeholder="Giá thuê"
+                    name="price"
                     style={{ marginBottom: "16px" }}
                   />
-                  <Input placeholder="Số tiền cọc" />
+                  <Input placeholder="Số tiền cọc" name="deposit" />
                 </Form.Item>
 
                 <Form.Item
@@ -159,9 +202,14 @@ const PostProperty = () => {
                 >
                   <Input
                     placeholder="Tiêu đề tin đăng"
+                    name="title"
                     style={{ marginBottom: "16px" }}
                   />
-                  <Input.TextArea placeholder="Mô tả chi tiết" rows={4} />
+                  <Input.TextArea
+                    placeholder="Mô tả chi tiết"
+                    name="description"
+                    rows={4}
+                  />
                 </Form.Item>
 
                 <Form.Item
@@ -170,6 +218,7 @@ const PostProperty = () => {
                       Bạn là
                     </span>
                   }
+                  name="userType"
                   style={{ marginBottom: "24px" }}
                 >
                   <Radio.Group>
@@ -203,6 +252,7 @@ const PostProperty = () => {
                 >
                   <Button
                     type="primary"
+                    htmlType="submit"
                     style={{
                       width: "300px",
                       background: "#ffffff",
@@ -218,7 +268,7 @@ const PostProperty = () => {
                       width: "300px",
                       background:
                         "linear-gradient(90deg, #fcd25e,#fdb859, #fc9a53)",
-                      border: "none", // Remove border to match gradient
+                      border: "none",
                     }}
                   >
                     Đăng Tin
