@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import api from "../config/axios";
+import api from "../../config/axios";
 import {
   Row,
   Col,
@@ -20,8 +20,8 @@ import {
   StarOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
-import AppHeader from "../components/Header/Header";
-import FooterComponent from "../components/Footer/Footer";
+import AppHeader from "../../components/Header/Header";
+import FooterComponent from "../../components/Footer/Footer";
 
 const { Title, Text } = Typography;
 const { Content } = Layout;

@@ -13,9 +13,9 @@ import { CardMedia } from "@mui/material";
 // import LocationOnIcon from "@mui/icons-material/LocationOn"; // Location Icon
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useNavigate } from "react-router-dom";
-import AppHeader from "../components/Header/Header";
-import FooterComponent from "../components/Footer/Footer";
-import api from "../config/axios";
+import AppHeader from "../../components/Header/Header";
+import FooterComponent from "../../components/Footer/Footer";
+import api from "../../config/axios";
 import { Link } from "react-router-dom";
 export default function HomePage() {
   const navigate = useNavigate();

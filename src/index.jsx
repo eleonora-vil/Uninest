@@ -2,10 +2,11 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { StyledEngineProvider } from "@mui/joy/styles";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AuthPage from "./Pages/AuthPage";
-import Homepage from "./Pages/Homepage";
-import PropertyPage from "./Pages/PropertyPage";
-import PostProperty from "./Pages/PostProperty";
+import AuthPage from "./Pages/AuthPage/AuthPage";
+import Homepage from "./Pages/Homepage/Homepage";
+import PropertyPage from "./Pages/DetailProperty/PropertyPage";
+import PostProperty from "./Pages/PostProperty/PostProperty";
+import PropertyList from "./Pages/PropertyList/PropertyListPage";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           <Route path="/" element={<Homepage />} />
           <Route path="/property/:id" element={<PropertyPage />} />
           <Route path="/posting" element={<PostProperty />} />
+          <Route path="/listing" element={<PropertyList />} />
         </Routes>
       </Router>
     </StyledEngineProvider>

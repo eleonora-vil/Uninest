@@ -18,8 +18,8 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import api from "../config/axios";
-import Uninest from "../assets/Uninest.png";
+import api from "../../config/axios";
+import Uninest from "../../assets/Uninest.png";
 
 // const customTheme = extendTheme({ defaultColorScheme: "dark" });
 

@@ -27,7 +27,7 @@ const categories = [
       {
         label: "Thuê nhà",
         key: "setting:1",
-        navigate: "/renting",
+        navigate: "/listing",
         // children: [
         //   {
         //     label: "Option 1",
