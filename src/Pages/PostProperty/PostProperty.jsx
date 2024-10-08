@@ -214,7 +214,7 @@ import {
   message,
 } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
-import "../components/Style/PostProperty.css";
+import "../../components/Style/PostProperty.css";
 import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
 
