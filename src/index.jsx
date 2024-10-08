@@ -7,6 +7,8 @@ import Homepage from "./Pages/Homepage/Homepage";
 import PropertyPage from "./Pages/DetailProperty/PropertyPage";
 import PostProperty from "./Pages/PostProperty/PostProperty";
 import PropertyList from "./Pages/PropertyList/PropertyListPage";
+import DashboardDefault from "./Pages/Dashboard";
+import ServiceList from "./Pages/ServiceList/PropertyListPage";
 
 const App = () => {
   return (
@@ -19,6 +21,8 @@ const App = () => {
           <Route path="/property/:id" element={<PropertyPage />} />
           <Route path="/posting" element={<PostProperty />} />
           <Route path="/listing" element={<PropertyList />} />
+          <Route path="/Dashboard" element={<DashboardDefault />} />
+          <Route path="/services" element={<ServiceList />} />
         </Routes>
       </Router>
     </StyledEngineProvider>
