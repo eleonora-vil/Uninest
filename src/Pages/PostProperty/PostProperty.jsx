@@ -209,7 +209,7 @@ import {
   Col,
   Row,
   Radio,
-  Typography,
+  // Typography,
   Breadcrumb,
   message,
 } from "antd";
@@ -219,7 +219,7 @@ import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
 
 const { Option } = Select;
-const { Text } = Typography;
+// const { Text } = Typography;
 
 const PostProperty = () => {
   const [fileList, setFileList] = useState([]);

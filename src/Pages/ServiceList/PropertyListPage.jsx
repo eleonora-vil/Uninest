@@ -50,7 +50,7 @@ const properties = [
   // Add more properties as needed
 ];
 
-const PropertyList = () => {
+const ServiceList = () => {
   const [filteredProperties, setFilteredProperties] = useState(properties);
   const [category, setCategory] = useState("Tất cả");
   const [sortLabel, setSortLabel] = useState("Giá thấp trước");
@@ -330,4 +330,4 @@ const PropertyList = () => {
   );
 };
 
-export default PropertyList;
+export default ServiceList;

@@ -122,7 +122,7 @@ export default function AuthPage() {
             setEmail(formData.get("email"));
             toggleAuthMode("verifyOTP");
           } else {
-            toggleAuthMode("signIn");
+            toggleAuthMode("signin");
           }
           break;
         }

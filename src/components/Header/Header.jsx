@@ -65,6 +65,7 @@ const AppHeader = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [fullName, setFullName] = useState("");
   const [current, setCurrent] = useState("mail");
+  const [userRole, setUserRole] = useState(""); // New state for user role
 
   const onClick = (e) => {
     console.log("click ", e);
@@ -79,6 +80,7 @@ const AppHeader = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedFullName = localStorage.getItem("fullName");
+    const storedUserData = localStorage.getItem("user");
     setIsLoggedIn(!!token);
     setFullName(storedFullName || "");
 
@@ -88,6 +90,12 @@ const AppHeader = () => {
           storedFullName
         )}`
       );
+    }
+
+    // Check user role
+    if (storedUserData) {
+      const userData = JSON.parse(storedUserData);
+      setUserRole(userData.roleId || "");
     }
   }, [navigate, location.pathname]);
 
@@ -117,10 +125,15 @@ const AppHeader = () => {
 
   const userMenu = (
     <Menu>
-      <Menu.Item key="1" onClick={() => navigate("/profile")}>
+      {userRole === "1" && (
+        <Menu.Item key="dashboard" onClick={() => navigate("/dashboard")}>
+          Dashboard
+        </Menu.Item>
+      )}
+      <Menu.Item key="profile" onClick={() => navigate("/profile")}>
         Profile
       </Menu.Item>
-      <Menu.Item key="2" onClick={handleLogout}>
+      <Menu.Item key="logout" onClick={handleLogout}>
         Logout
       </Menu.Item>
     </Menu>
@@ -140,6 +153,11 @@ const AppHeader = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        zIndex: 1000,
+        height: 64, // Specify a fixed height
       }}
     >
       <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
