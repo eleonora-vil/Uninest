@@ -24,7 +24,7 @@ export default function HomePage() {
   const [error, setError] = React.useState(null); // Handle errors
 
   const handleHomeClick = () => {
-    navigate("/");
+    navigate("/listing");
   };
 
   React.useEffect(() => {

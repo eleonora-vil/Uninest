@@ -227,7 +227,7 @@ const PostProperty = () => {
   const handleUploadChange = ({ fileList }) => {
     setFileList(fileList);
   };
-
+  const handleSubmit = async (event) => {};
   const onFinish = async (values) => {
     const formData = new FormData();
     formData.append("name", values.name);
@@ -471,6 +471,7 @@ const PostProperty = () => {
                         "linear-gradient(90deg, #fcd25e,#fdb859, #fc9a53)",
                       border: "none",
                     }}
+                    onClick={{}}
                   >
                     Đăng Tin
                   </Button>
