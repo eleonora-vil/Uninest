@@ -17,8 +17,8 @@ import { NumericFormat } from "react-number-format";
 // project import
 import Dot from "../../components/@extended/Dot";
 
-function createData(tracking_no, name, fat, carbs, protein) {
-  return { tracking_no, name, fat, carbs, protein };
+function createData(transaction_id, name, fat, carbs, protein) {
+  return { transaction_id, name, fat, carbs, protein };
 }
 
 const rows = [
@@ -64,35 +64,29 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "tracking_no",
+    id: "transaction_id",
     align: "left",
     disablePadding: false,
-    label: "Tracking No.",
+    label: "Transaction ID",
   },
   {
     id: "name",
     align: "left",
     disablePadding: true,
-    label: "Product Name",
+    label: "Type",
   },
-  {
-    id: "fat",
-    align: "right",
-    disablePadding: false,
-    label: "Total Order",
-  },
+
   {
     id: "carbs",
     align: "left",
     disablePadding: false,
-
     label: "Status",
   },
   {
     id: "protein",
     align: "right",
     disablePadding: false,
-    label: "Total Amount",
+    label: "Amount",
   },
 ];
 
@@ -151,7 +145,7 @@ function OrderStatus({ status }) {
 
 export default function OrderTable() {
   const order = "asc";
-  const orderBy = "tracking_no";
+  const orderBy = "transaction_id";
 
   return (
     <Box>
@@ -181,10 +175,9 @@ export default function OrderTable() {
                     key={row.tracking_no}
                   >
                     <TableCell component="th" id={labelId} scope="row">
-                      <Link color="secondary"> {row.tracking_no}</Link>
+                      <Link color="secondary"> {row.transaction_id}</Link>
                     </TableCell>
                     <TableCell>{row.name}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
                     <TableCell>
                       <OrderStatus status={row.carbs} />
                     </TableCell>

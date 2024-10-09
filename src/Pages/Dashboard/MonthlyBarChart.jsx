@@ -1,48 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
+import { useTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import ReactApexChart from "react-apexcharts";
+import { getTotalEarningsByDay } from "../../config/axios"; // Update the import path as needed
 
-// material-ui
-import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-
-// third-party
-import ReactApexChart from 'react-apexcharts';
-
-// chart options
 const barChartOptions = {
   chart: {
-    type: 'bar',
+    type: "bar",
     height: 365,
     toolbar: {
-      show: false
-    }
+      show: false,
+    },
   },
   plotOptions: {
     bar: {
-      columnWidth: '45%',
-      borderRadius: 4
-    }
+      columnWidth: "45%",
+      borderRadius: 4,
+    },
   },
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   xaxis: {
-    categories: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+    categories: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
     axisBorder: {
-      show: false
+      show: false,
     },
     axisTicks: {
-      show: false
-    }
+      show: false,
+    },
   },
   yaxis: {
-    show: false
+    show: false,
   },
   grid: {
-    show: false
-  }
+    show: false,
+  },
 };
-
-// ==============================|| MONTHLY BAR CHART ||============================== //
 
 export default function MonthlyBarChart() {
   const theme = useTheme();
@@ -50,31 +44,70 @@ export default function MonthlyBarChart() {
   const { primary, secondary } = theme.palette.text;
   const info = theme.palette.info.light;
 
-  const [series] = useState([
-    {
-      data: [80, 95, 70, 42, 65, 55, 78]
-    }
-  ]);
-
+  const [series, setSeries] = useState([{ data: [0, 0, 0, 0, 0, 0, 0] }]);
   const [options, setOptions] = useState(barChartOptions);
+
+  useEffect(() => {
+    const fetchEarningsByDay = async () => {
+      try {
+        const response = await getTotalEarningsByDay();
+        const earningsData = response.data;
+
+        // Sort the data to ensure it's in the correct order (Sunday to Saturday)
+        const sortedData = earningsData.sort((a, b) => {
+          const days = [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ];
+          return days.indexOf(a.day) - days.indexOf(b.day);
+        });
+
+        const earnings = sortedData.map((item) => item.totalEarnings);
+        setSeries([{ data: earnings }]);
+
+        setOptions((prevState) => ({
+          ...prevState,
+          xaxis: {
+            ...prevState.xaxis,
+            categories: sortedData.map((item) => item.day.substring(0, 2)),
+          },
+        }));
+      } catch (error) {
+        console.error("Error fetching earnings by day:", error);
+      }
+    };
+
+    fetchEarningsByDay();
+  }, []);
 
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
       colors: [info],
       xaxis: {
+        ...prevState.xaxis,
         labels: {
           style: {
-            colors: [secondary, secondary, secondary, secondary, secondary, secondary, secondary]
-          }
-        }
-      }
+            colors: Array(7).fill(secondary),
+          },
+        },
+      },
     }));
   }, [primary, info, secondary]);
 
   return (
-    <Box id="chart" sx={{ bgcolor: 'transparent' }}>
-      <ReactApexChart options={options} series={series} type="bar" height={365} />
+    <Box id="chart" sx={{ bgcolor: "transparent" }}>
+      <ReactApexChart
+        options={options}
+        series={series}
+        type="bar"
+        height={365}
+      />
     </Box>
   );
 }

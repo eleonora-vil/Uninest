@@ -20,4 +20,19 @@ const handleBefore = (config) => {
 };
 api.interceptors.request.use(handleBefore, null);
 
+export const getTotalUsersCount = () => {
+  return api.get("/api/Dashboard/userCount");
+};
+export const getTotalPostsCount = () => {
+  return api.get("/api/Dashboard/postCount");
+};
+export const getTotalEarnings = () => {
+  return api.get("/api/Dashboard/total-earnings");
+};
+export const getTotalEarningsByDay = () => {
+  return api.get("/api/Dashboard/total-earnings-by-day");
+};
+export const getRecentUsers = (count = 10) => {
+  return api.get(`/api/Dashboard/recent-users?count=${count}`);
+};
 export default api;
