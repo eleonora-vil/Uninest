@@ -10,11 +10,13 @@ import Box from "@mui/material/Box";
 // project import
 import MainCard from "../../components/MainCard";
 import IncomeAreaChart from "./IncomeAreaChart";
+import useUniqueVisitorTracker from "../../hooks/useVisitorTracking";
 
 // ==============================|| DEFAULT - UNIQUE VISITOR ||============================== //
 
 export default function UniqueVisitorCard() {
   const [slot, setSlot] = useState("week");
+  const uniqueVisitors = useUniqueVisitorTracker();
 
   return (
     <>
@@ -47,7 +49,11 @@ export default function UniqueVisitorCard() {
       </Grid>
       <MainCard content={false} sx={{ mt: 1.5 }}>
         <Box sx={{ pt: 1, pr: 2 }}>
-          <IncomeAreaChart slot={slot} />
+          <Typography variant="h6" color="textSecondary">
+            {slot === "week" ? "Weekly" : "Monthly"} Unique Visitors:{" "}
+            {slot === "week" ? uniqueVisitors.weekly : uniqueVisitors.monthly}
+          </Typography>
+          <IncomeAreaChart slot={slot} uniqueVisitors={uniqueVisitors} />
         </Box>
       </MainCard>
     </>

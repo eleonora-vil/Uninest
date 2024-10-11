@@ -1,114 +1,123 @@
-import PropTypes from 'prop-types';
-import { useState, useEffect } from 'react';
+import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
+import { useTheme } from "@mui/material/styles";
+import ReactApexChart from "react-apexcharts";
 
-// material-ui
-import { useTheme } from '@mui/material/styles';
-
-// third-party
-import ReactApexChart from 'react-apexcharts';
-
-// chart options
 const areaChartOptions = {
   chart: {
     height: 450,
-    type: 'area',
+    type: "area",
     toolbar: {
-      show: false
-    }
+      show: false,
+    },
   },
   dataLabels: {
-    enabled: false
+    enabled: false,
   },
   stroke: {
-    curve: 'smooth',
-    width: 2
+    curve: "smooth",
+    width: 2,
   },
   grid: {
-    strokeDashArray: 0
-  }
+    strokeDashArray: 0,
+  },
 };
 
-// ==============================|| INCOME AREA CHART ||============================== //
-
-export default function IncomeAreaChart({ slot }) {
+export default function IncomeAreaChart({ slot, uniqueVisitors }) {
   const theme = useTheme();
 
-  const { primary, secondary } = theme.palette.text;
+  const { secondary } = theme.palette.text;
   const line = theme.palette.divider;
 
   const [options, setOptions] = useState(areaChartOptions);
+  const [series, setSeries] = useState([]);
 
   useEffect(() => {
     setOptions((prevState) => ({
       ...prevState,
-      colors: [theme.palette.primary.main, theme.palette.primary[700]],
+      colors: [theme.palette.primary.main],
       xaxis: {
         categories:
-          slot === 'month'
-            ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+          slot === "month"
+            ? [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+              ]
+            : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         labels: {
           style: {
-            colors: [
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary,
-              secondary
-            ]
-          }
+            colors: Array(12).fill(secondary),
+          },
         },
         axisBorder: {
           show: true,
-          color: line
+          color: line,
         },
-        tickAmount: slot === 'month' ? 11 : 7
+        tickAmount: slot === "month" ? 11 : 7,
       },
       yaxis: {
         labels: {
           style: {
-            colors: [secondary]
-          }
-        }
+            colors: [secondary],
+          },
+        },
       },
       grid: {
-        borderColor: line
-      }
+        borderColor: line,
+      },
+      tooltip: {
+        theme: "light",
+      },
     }));
-  }, [primary, secondary, line, theme, slot]);
-
-  const [series, setSeries] = useState([
-    {
-      name: 'Page Views',
-      data: [0, 86, 28, 115, 48, 210, 136]
-    },
-    {
-      name: 'Sessions',
-      data: [0, 43, 14, 56, 24, 105, 68]
-    }
-  ]);
+  }, [secondary, line, theme, slot]);
 
   useEffect(() => {
+    const uniqueVisitorData =
+      slot === "month"
+        ? Array.from({ length: 12 }, () =>
+            Math.floor(
+              (uniqueVisitors.monthly / 12) * (0.8 + Math.random() * 0.4)
+            )
+          )
+        : Array.from({ length: 7 }, () =>
+            Math.floor(
+              (uniqueVisitors.weekly / 7) * (0.8 + Math.random() * 0.4)
+            )
+          );
+
     setSeries([
       {
-        name: 'Page Views',
-        data: slot === 'month' ? [76, 85, 101, 98, 87, 105, 91, 114, 94, 86, 115, 35] : [31, 40, 28, 51, 42, 109, 100]
+        name: "Unique Visitors",
+        data: uniqueVisitorData,
       },
-      {
-        name: 'Sessions',
-        data: slot === 'month' ? [110, 60, 150, 35, 60, 36, 26, 45, 65, 52, 53, 41] : [11, 32, 45, 32, 34, 52, 41]
-      }
     ]);
-  }, [slot]);
+  }, [slot, uniqueVisitors]);
 
-  return <ReactApexChart options={options} series={series} type="area" height={450} />;
+  return (
+    <ReactApexChart
+      options={options}
+      series={series}
+      type="area"
+      height={450}
+    />
+  );
 }
 
-IncomeAreaChart.propTypes = { slot: PropTypes.string };
+IncomeAreaChart.propTypes = {
+  slot: PropTypes.string,
+  uniqueVisitors: PropTypes.shape({
+    daily: PropTypes.number,
+    weekly: PropTypes.number,
+    monthly: PropTypes.number,
+  }),
+};
