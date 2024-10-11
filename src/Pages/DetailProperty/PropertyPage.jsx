@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import api from "../../config/axios";
 import {
   Row,
@@ -22,6 +22,8 @@ import {
 } from "@ant-design/icons";
 import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
+import { FitScreen } from "@mui/icons-material";
+import { Box } from "@mui/joy";
 
 const { Title, Text } = Typography;
 const { Content } = Layout;
@@ -36,10 +38,10 @@ const ImageGallery = ({ images }) => {
           src={mainImage}
           alt="Main Property Image"
           style={{
-            width: "100%",
-            height: "auto",
-            maxHeight: "650px",
-            objectFit: "cover",
+            width: "55vw",
+            height: "75vh",
+            maxHeight: "100vh",
+            maxWidth: "100vw",
           }}
         />
       </Col>
@@ -102,7 +104,30 @@ const PropertyPage = () => {
         {/* Breadcrumb */}
         <Row>
           <Col span={20}>
-            <Text>Trang chủ &gt; Nhà thuê &gt; {propertyDetails.name}</Text>
+            <Text>
+              <Link
+                underline="none"
+                to={`/`}
+                style={{
+                  textDecoration: "none",
+                  color: "#F9A825",
+                }}
+              >
+                Trang chủ
+              </Link>{" "}
+              &gt;{" "}
+              <Link
+                underline="none"
+                to={`/listing`}
+                style={{
+                  textDecoration: "none",
+                  color: "#F9A825",
+                }}
+              >
+                Nhà Thuê
+              </Link>{" "}
+              &gt; {propertyDetails.name}
+            </Text>
           </Col>
         </Row>
 
@@ -115,7 +140,7 @@ const PropertyPage = () => {
 
           {/* Owner Information */}
           <Col xs={24} lg={10}>
-            <Card>
+            <Card style={{ top: 0, zIndex: 1 }}>
               <Row gutter={[16, 16]}>
                 {/* Owner Details */}
                 <Col span={24}>
@@ -157,31 +182,42 @@ const PropertyPage = () => {
         </Row>
 
         {/* Property Details Section */}
-        <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
+        <Row gutter={[16, 16]} style={{ marginTop: 20, width: "100%" }}>
           <Col xs={24} lg={14}>
-            <Card>
-              <Descriptions title="Property Details" bordered>
+            <Card
+              style={{
+                height: "100%",
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Descriptions
+                title="Chi tiết cho thuê"
+                bordered
+                style={{ width: "100%" }}
+              >
                 <Descriptions.Item label="ID">
                   {propertyDetails.homeId}
                 </Descriptions.Item>
-                <Descriptions.Item label="Size">
-                  {propertyDetails.size} sqm
+                <Descriptions.Item label="Diện tích">
+                  {propertyDetails.size} 300 sqm
                 </Descriptions.Item>
-                <Descriptions.Item label="Bathrooms">
-                  {propertyDetails.bathroom}
+                <Descriptions.Item label="Phòng tắm">
+                  {propertyDetails.bathroom} phòng
                 </Descriptions.Item>
-                <Descriptions.Item label="Price">
-                  ${propertyDetails.price}
+                <Descriptions.Item label="Giá cả">
+                  ${propertyDetails.price}/Tháng
                 </Descriptions.Item>
-                <Descriptions.Item label="Bedrooms">
-                  {propertyDetails.bedrooms}
+                <Descriptions.Item label="Phòng ngủ">
+                  {propertyDetails.bedrooms} phòng
                 </Descriptions.Item>
-                <Descriptions.Item label="Name">
+                {/* <Descriptions.Item label="Name" style={{ width: "20%" }}>
                   {propertyDetails.name}
-                </Descriptions.Item>
+                </Descriptions.Item> */}
               </Descriptions>
 
-              <Divider>Description</Divider>
+              <Divider>Mô tả</Divider>
               <Text>{propertyDetails.description}</Text>
             </Card>
           </Col>
@@ -189,8 +225,8 @@ const PropertyPage = () => {
           {/* Map Section */}
           <Col xs={24} lg={10}>
             <Card
-              title="Location"
-              extra={<Button href="#map">View on Google Maps</Button>}
+              title="Vị trí"
+              extra={<Button href="#map">Vị trí trên Google Maps</Button>}
             >
               {/* Insert Google Maps API or Image Here */}
               <Image
@@ -200,7 +236,7 @@ const PropertyPage = () => {
               />
             </Card>
 
-            <Card title="Other Areas" style={{ marginTop: 20 }}>
+            <Card title="Khu vực khác" style={{ marginTop: 20 }}>
               <List
                 size="small"
                 dataSource={[

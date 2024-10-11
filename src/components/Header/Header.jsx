@@ -154,7 +154,7 @@ const AppHeader = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        position: "fixed",
+        position: "sticky",
         top: 0,
         left: 0,
         zIndex: 1000,
