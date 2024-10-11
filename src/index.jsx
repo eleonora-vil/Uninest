@@ -9,6 +9,7 @@ import PostProperty from "./Pages/PostProperty/PostProperty";
 import PropertyList from "./Pages/PropertyList/PropertyListPage";
 import DashboardDefault from "./Pages/Dashboard";
 import ServiceList from "./Pages/ServiceList/PropertyListPage";
+import UserProfile from "./Pages/UserProfile/UserProfile";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/listing" element={<PropertyList />} />
           <Route path="/Dashboard" element={<DashboardDefault />} />
           <Route path="/services" element={<ServiceList />} />
+          <Route path="/profile" element={<UserProfile />} />
         </Routes>
       </Router>
     </StyledEngineProvider>
