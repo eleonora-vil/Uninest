@@ -17,6 +17,7 @@ import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
 import api from "../../config/axios";
 import { Link } from "react-router-dom";
+import TruncatedText from "../../utils/TruncatedText";
 export default function HomePage() {
   const navigate = useNavigate();
   const [cardData, setCardData] = React.useState([]); // Store house data
@@ -93,7 +94,14 @@ export default function HomePage() {
         to={`/property/${item.homeId}`}
         style={{ textDecoration: "none", color: "inherit" }}
       >
-        <Card sx={{ minWidth: 200, marginRight: 2, borderRadius: 5 }}>
+        <Card
+          sx={{
+            minWidth: 200,
+            marginRight: 2,
+            borderRadius: 5,
+            height: "wrap-content",
+          }}
+        >
           {item.homeImages && item.homeImages.length > 0 ? (
             <CardMedia
               component="img"
@@ -110,12 +118,16 @@ export default function HomePage() {
             />
           )}
           <CardContent>
-            <Typography variant="h2">{item.name}</Typography>
-            <Typography variant="h10">{item.description}</Typography>
+            <Typography variant="h2">
+              <TruncatedText text={item.name} maxLength="30" />
+            </Typography>
+            <Typography variant="h10">
+              <TruncatedText text={item.description} maxLength="20" />{" "}
+            </Typography>
             <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
               <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
               <Typography variant="body2" color="text.secondary">
-                {item.price}
+                {item.price}.000đ/Tháng
               </Typography>
             </Box>
             {/* Removed postTime and postPlace as they're not in the API response */}
@@ -191,6 +203,7 @@ export default function HomePage() {
                 color: "#fff",
                 textAlign: "center",
                 mb: 4,
+                width: "50%",
               }}
             >
               Cùng tìm kiếm một căn trọ hoàn hảo cho bạn với UNINEST
