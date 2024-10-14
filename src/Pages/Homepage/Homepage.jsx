@@ -18,6 +18,7 @@ import FooterComponent from "../../components/Footer/Footer";
 import api from "../../config/axios";
 import { Link } from "react-router-dom";
 import TruncatedText from "../../utils/TruncatedText";
+import { decorate } from "react-toastify/addons/use-notification-center";
 export default function HomePage() {
   const navigate = useNavigate();
   const [cardData, setCardData] = React.useState([]); // Store house data
@@ -122,7 +123,7 @@ export default function HomePage() {
               <TruncatedText text={item.name} maxLength="30" />
             </Typography>
             <Typography variant="h10">
-              <TruncatedText text={item.description} maxLength="20" />{" "}
+              {item.bedrooms} PN - {item.bathroom} NVS
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
               <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
@@ -183,7 +184,7 @@ export default function HomePage() {
         >
           <Box
             sx={{
-              height: "70vh",
+              height: "60vh",
               position: "relative",
               backgroundImage:
                 "url(https://images.pexels.com/photos/2988860/pexels-photo-2988860.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)",
@@ -303,7 +304,7 @@ export default function HomePage() {
           {/* Existing Main Content */}
           <Box
             sx={{
-              mt: "20vh",
+              mt: "15vh",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -319,12 +320,46 @@ export default function HomePage() {
                 bgcolor: "#fff",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 p: 3,
-                display: "flex",
+                display: "block",
+
                 overflowX: "auto",
                 gap: 2,
               }}
             >
-              {renderCards(cardData)}
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#343131",
+                    fontWeight: "bold",
+                    mb: 2,
+                  }}
+                >
+                  Cho thuê trong khu vực của bạn
+                </Typography>
+                <Link
+                  underline="none"
+                  to={`/listing`}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Xem thêm <span style={{ marginLeft: "4px" }}>&gt;</span>
+                </Link>
+              </Box>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  overflowX: "auto",
+                  gap: 2,
+                }}
+              >
+                {renderCards(cardData)}
+              </Box>
             </Box>
 
             {/* Second Box with Scrollable Cards */}
@@ -335,12 +370,47 @@ export default function HomePage() {
                 bgcolor: "#fff",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 p: 3,
-                display: "flex",
+                display: "block",
+
                 overflowX: "auto",
                 gap: 2,
               }}
             >
-              {renderCards(cardData)}
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#343131",
+                    fontWeight: "bold",
+                    mb: 2,
+                  }}
+                >
+                  Cho thuê
+                </Typography>
+                <Link
+                  href="http://localhost:5173/listing" // Replace with your desired URL
+                  underline="none"
+                  to={`/listing`}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Xem thêm <span style={{ marginLeft: "4px" }}>&gt;</span>
+                </Link>
+              </Box>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  overflowX: "auto",
+                  gap: 2,
+                }}
+              >
+                {renderCards(cardData)}
+              </Box>
             </Box>
           </Box>
         </Box>
