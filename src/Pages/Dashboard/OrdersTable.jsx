@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-// material-ui
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Table from "@mui/material/Table";
@@ -10,29 +10,9 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-
-// third-party
 import { NumericFormat } from "react-number-format";
-
-// project import
 import Dot from "../../components/@extended/Dot";
-
-function createData(transaction_id, name, fat, carbs, protein) {
-  return { transaction_id, name, fat, carbs, protein };
-}
-
-const rows = [
-  createData(84564564, "Camera Lens", 40, 2, 40570),
-  createData(98764564, "Laptop", 300, 0, 180139),
-  createData(98756325, "Mobile", 355, 1, 90989),
-  createData(98652366, "Handset", 50, 1, 10239),
-  createData(13286564, "Computer Accessories", 100, 1, 83348),
-  createData(86739658, "TV", 99, 0, 410780),
-  createData(13256498, "Keyboard", 125, 2, 70999),
-  createData(98753263, "Mouse", 89, 2, 10570),
-  createData(98753275, "Desktop", 185, 1, 98063),
-  createData(98753291, "Chair", 100, 0, 14001),
-];
+import { getRecentTransactions } from "../../config/axios";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -64,26 +44,25 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "transaction_id",
+    id: "transactionId",
     align: "left",
     disablePadding: false,
     label: "Transaction ID",
   },
   {
-    id: "name",
+    id: "username",
     align: "left",
     disablePadding: true,
-    label: "Type",
+    label: "Username",
   },
-
   {
-    id: "carbs",
+    id: "status",
     align: "left",
     disablePadding: false,
     label: "Status",
   },
   {
-    id: "protein",
+    id: "amount",
     align: "right",
     disablePadding: false,
     label: "Amount",
@@ -115,22 +94,22 @@ function OrderStatus({ status }) {
   let color;
   let title;
 
-  switch (status) {
-    case 0:
+  switch (status.toLowerCase()) {
+    case "active":
+      color = "success";
+      title = "Active";
+      break;
+    case "pending":
       color = "warning";
       title = "Pending";
       break;
-    case 1:
-      color = "success";
-      title = "Approved";
-      break;
-    case 2:
+    case "cancelled":
       color = "error";
-      title = "Rejected";
+      title = "Cancelled";
       break;
     default:
       color = "primary";
-      title = "None";
+      title = status;
   }
 
   return (
@@ -144,8 +123,31 @@ function OrderStatus({ status }) {
 // ==============================|| ORDER TABLE ||============================== //
 
 export default function OrderTable() {
-  const order = "asc";
-  const orderBy = "transaction_id";
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("transactionId");
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const response = await getRecentTransactions();
+      setTransactions(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching transactions:", err);
+      setError("Failed to fetch transactions");
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <Typography>Loading...</Typography>;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Box>
@@ -162,7 +164,7 @@ export default function OrderTable() {
         <Table aria-labelledby="tableTitle">
           <OrderTableHead order={order} orderBy={orderBy} />
           <TableBody>
-            {stableSort(rows, getComparator(order, orderBy)).map(
+            {stableSort(transactions, getComparator(order, orderBy)).map(
               (row, index) => {
                 const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -172,21 +174,23 @@ export default function OrderTable() {
                     role="checkbox"
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     tabIndex={-1}
-                    key={row.tracking_no}
+                    key={row.transactionId}
                   >
                     <TableCell component="th" id={labelId} scope="row">
-                      <Link color="secondary"> {row.transaction_id}</Link>
+                      <Link color="secondary">{row.transactionId}</Link>
                     </TableCell>
-                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{row.username}</TableCell>
                     <TableCell>
-                      <OrderStatus status={row.carbs} />
+                      <OrderStatus status={row.status} />
                     </TableCell>
                     <TableCell align="right">
                       <NumericFormat
-                        value={row.protein}
+                        value={row.amount}
                         displayType="text"
                         thousandSeparator
                         prefix="$"
+                        decimalScale={2}
+                        fixedDecimalScale
                       />
                     </TableCell>
                   </TableRow>
@@ -201,5 +205,4 @@ export default function OrderTable() {
 }
 
 OrderTableHead.propTypes = { order: PropTypes.any, orderBy: PropTypes.string };
-
-OrderStatus.propTypes = { status: PropTypes.number };
+OrderStatus.propTypes = { status: PropTypes.string };

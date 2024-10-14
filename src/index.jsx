@@ -25,7 +25,6 @@ const AppContent = () => {
     // This effect will run on every route change
     console.log(`Page viewed: ${location.pathname}`);
     console.log(`Unique visitors: `, uniqueVisitors);
-    // Here you can also send this data to your analytics service if needed
   }, [location, uniqueVisitors]);
 
   return (

@@ -14,7 +14,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import IconButton from "@mui/joy/IconButton";
 import Uninest from "../../assets/Uninest.png";
-import MenuBookRounded from "@mui/icons-material/MenuBookRounded";
 
 const { Header } = Layout;
 // const { SubMenu } = Menu;
@@ -29,31 +28,11 @@ const categories = [
         label: "Thuê nhà",
         key: "setting:1",
         navigate: "/listing",
-        // children: [
-        //   {
-        //     label: "Option 1",
-        //     key: "setting:1",
-        //   },
-        //   {
-        //     label: "Option 2",
-        //     key: "setting:2",
-        //   },
-        // ],
       },
       {
         label: "Dịch vụ bên thứ ba",
         key: "setting:2",
         navigate: "/services",
-        // children: [
-        //   {
-        //     label: "Option 3",
-        //     key: "setting:3",
-        //   },
-        //   {
-        //     label: "Option 4",
-        //     key: "setting:4",
-        //   },
-        // ],
       },
     ],
   },
@@ -67,6 +46,7 @@ const AppHeader = () => {
   const [fullName, setFullName] = useState("");
   const [current, setCurrent] = useState("mail");
   const [userRole, setUserRole] = useState(""); // New state for user role
+  const [userData, setUserData] = useState(null);
 
   const onClick = (e) => {
     console.log("click ", e);
@@ -80,33 +60,32 @@ const AppHeader = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const storedFullName = localStorage.getItem("fullName");
     const storedUserData = localStorage.getItem("user");
     setIsLoggedIn(!!token);
-    setFullName(storedFullName || "");
 
-    if (token && storedFullName) {
-      setAvatarUrl(
-        `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
-          storedFullName
-        )}`
-      );
-    }
-
-    // Check user role
     if (storedUserData) {
-      const userData = JSON.parse(storedUserData);
-      setUserRole(userData.roleId || "");
+      const parsedUserData = JSON.parse(storedUserData);
+      setUserData(parsedUserData);
+      setFullName(parsedUserData.fullName || "");
+      setUserRole(parsedUserData.roleID.toString()); // Convert to string to match your condition
+
+      if (parsedUserData.fullName) {
+        setAvatarUrl(
+          `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
+            parsedUserData.fullName
+          )}`
+        );
+      }
     }
-  }, [navigate, location.pathname]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("fullName");
-    localStorage.clear();
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
+    setUserData(null);
     setFullName("");
+    setUserRole("");
     toast.info("Logged out", {
       position: "top-right",
       autoClose: 3000,
@@ -119,14 +98,11 @@ const AppHeader = () => {
       transition: Bounce,
     });
     navigate("/");
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
   };
 
   const userMenu = (
     <Menu>
-      {userRole === "1" && (
+      {userData && userData.roleID === 1 && (
         <Menu.Item key="dashboard" onClick={() => navigate("/dashboard")}>
           Dashboard
         </Menu.Item>
@@ -191,11 +167,11 @@ const AppHeader = () => {
         <Button type="text" icon={<FileOutlined />} size="large" />
       </Space>
 
-      {isLoggedIn ? (
+      {userData ? (
         <Dropdown overlay={userMenu} placement="bottomRight" size="large">
           <Space style={{ cursor: "pointer" }}>
             <Avatar src={avatarUrl} />
-            <span>{fullName}</span>
+            <span>{userData.fullName}</span>
             <DownOutlined />
           </Space>
         </Dropdown>

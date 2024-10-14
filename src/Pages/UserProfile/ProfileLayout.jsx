@@ -1,5 +1,5 @@
 // src/ProfileLayout.js
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import {
   Layout,
   Form,
@@ -9,72 +9,79 @@ import {
   Row,
   Col,
   DatePicker,
-  Modal,
+  message,
 } from "antd";
+import moment from "moment";
+import userService from "./userService";
 
 const { Content } = Layout;
 const { Option } = Select;
 
-const ProfileLayout = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+const ProfileLayout = ({ userData, onUpdateSuccess }) => {
+  const [form] = Form.useForm();
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+  useEffect(() => {
+    if (userData) {
+      form.setFieldsValue({
+        ...userData,
+        birthDate: userData.birthDate ? moment(userData.birthDate) : null,
+      });
+    }
+  }, [userData, form]);
 
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const onFinish = async (values) => {
+    try {
+      const response = await userService.updateProfile(values);
+      if (response.data.success) {
+        message.success("Profile updated successfully");
+        if (onUpdateSuccess) onUpdateSuccess(response.data.result);
+      }
+    } catch (error) {
+      message.error(
+        "Failed to update profile: " +
+          (error.response?.data?.message || error.message)
+      );
+    }
   };
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#ffff" }}>
       <Content style={{ padding: "20px", maxWidth: "1500px" }}>
-        <Form layout="vertical">
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Họ và tên">
-                <Input defaultValue="Nguyễn Minh Quang" />
+              <Form.Item
+                label="Họ và tên"
+                name="fullName"
+                rules={[{ required: true }]}
+              >
+                <Input />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Số điện thoại">
-                <Input defaultValue="0976812860" />
+              <Form.Item label="Số điện thoại" name="phoneNumber">
+                <Input />
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item label="Địa chỉ">
-            <Input onClick={showModal} placeholder="Click to add details" />
-          </Form.Item>
-          <Form.Item label="Giới thiệu">
-            <Input.TextArea rows={4} />
-          </Form.Item>
-          <Form.Item label="Tên gọi nhớ">
-            <Input defaultValue="https://www.uninest.com/user/ten-goi-nho" />
-          </Form.Item>
-          <Form.Item label="Email">
-            <Input
-              defaultValue="nguyenminhquang@gmail.com"
-              suffix={<a href="#">Thay đổi</a>}
-            />
-          </Form.Item>
-          <Form.Item label="CCCD/CMND">
+          <Form.Item label="Địa chỉ" name="address">
             <Input />
+          </Form.Item>
+          <Form.Item label="Email" name="email">
+            <Input disabled />
           </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item label="Giới tính">
-                <Select defaultValue="Nam">
-                  <Option value="Nam">Nam</Option>
-                  <Option value="Nữ">Nữ</Option>
+              <Form.Item label="Giới tính" name="gender">
+                <Select>
+                  <Option value="Male">Nam</Option>
+                  <Option value="Female">Nữ</Option>
+                  <Option value="Other">Khác</Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item label="Ngày, tháng, năm sinh">
+              <Form.Item label="Ngày, tháng, năm sinh" name="birthDate">
                 <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} />
               </Form.Item>
             </Col>
@@ -82,6 +89,7 @@ const ProfileLayout = () => {
           <Form.Item>
             <Button
               type="primary"
+              htmlType="submit"
               style={{
                 background: "linear-gradient(to right, #f9a825, #f57c00)",
                 borderColor: "#f57c00",
@@ -92,31 +100,6 @@ const ProfileLayout = () => {
           </Form.Item>
         </Form>
       </Content>
-
-      <Modal
-        title="Chi tiết địa chỉ"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <Form layout="vertical">
-          <Form.Item label="Số nhà">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Đường">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Phường/Xã">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Quận/Huyện">
-            <Input />
-          </Form.Item>
-          <Form.Item label="Tỉnh/Thành phố">
-            <Input />
-          </Form.Item>
-        </Form>
-      </Modal>
     </Layout>
   );
 };
