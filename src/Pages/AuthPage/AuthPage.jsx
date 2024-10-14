@@ -109,7 +109,31 @@ export default function AuthPage() {
               );
             }
           } catch (error) {
-            // Your existing error handling code...
+            if (error.response && error.response.status === 401) {
+              // Check the specific error message or code from the backend
+              const errorMessage = error.response.data.message;
+              if (
+                errorMessage ===
+                "Please verify your email. An OTP has been sent to your email."
+              ) {
+                setEmail(formData.get("email"));
+                toggleAuthMode("verifyOTP");
+              } else if (errorMessage === "Invalid password.") {
+                alert("Invalid password. Please try again.");
+              } else if (errorMessage === "Invalid email.") {
+                alert("Invalid email. Please try again.");
+              } else {
+                // Handle other types of 401 errors
+                alert("Authentication failed. Please try again.");
+              }
+            } else {
+              // Handle other errors (server errors, network issues, etc.)
+              console.error("Login error:", error);
+              alert(
+                error.response?.data?.message ||
+                  "An error occurred during login. Please try again."
+              );
+            }
           }
           break;
         }
