@@ -16,6 +16,7 @@ import DashboardDefault from "./Pages/Dashboard";
 import ServiceList from "./Pages/ServiceList/PropertyListPage";
 import UserProfile from "./Pages/UserProfile/UserProfile";
 import useUniqueVisitorTracker from "./hooks/useVisitorTracking"; // Import the hook we created earlier
+import ManageProperty from "./Pages/ManageProperty/ManageProperty";
 
 const AppContent = () => {
   const location = useLocation();
@@ -37,6 +38,7 @@ const AppContent = () => {
       <Route path="/Dashboard" element={<DashboardDefault />} />
       <Route path="/services" element={<ServiceList />} />
       <Route path="/profile" element={<UserProfile />} />
+      <Route path="/manageProps" element={<ManageProperty />} />
     </Routes>
   );
 };
