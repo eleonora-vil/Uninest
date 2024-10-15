@@ -1,5 +1,14 @@
-import React from "react";
-import { Layout, Card, Avatar, List, Button, Tag, Breadcrumb } from "antd";
+import React, { useState, useEffect } from "react";
+import {
+  Layout,
+  Card,
+  Avatar,
+  List,
+  Button,
+  Tag,
+  Breadcrumb,
+  message,
+} from "antd";
 import {
   UserOutlined,
   EnvironmentOutlined,
@@ -8,26 +17,47 @@ import {
 import CustomSider from "./CustomSider";
 import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
-import "./ManageProperty.css"; // Import the CSS file
+import PropertyService from "./PropertyService";
+import "./ManageProperty.css";
 
 const { Content } = Layout;
 
-const properties = [
-  {
-    title: "Cho thuê phòng Tx38, Hà Huy Giáp quận 12",
-    size: "18 m²",
-    price: "1,60 triệu/tháng",
-    status: "Có sẵn",
-    tenant: "Thành Tài",
-    feedback: "Sạch sẽ thoáng mát",
-    rating: 4.5,
-    location: "Phường Thạnh Xuân",
-    owner: "Minh Quang",
-  },
-  // Add more properties as needed
-];
-
 const ManageProperty = () => {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const fetchProperties = async () => {
+    try {
+      setLoading(true);
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (!userData || !userData.userId) {
+        throw new Error("User ID not found");
+      }
+      const data = await PropertyService.getHomesByUserId(userData.userId);
+      setProperties(data);
+    } catch (error) {
+      console.error("Error fetching properties:", error);
+      message.error("Failed to fetch properties");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await PropertyService.deleteHome(id);
+      message.success("Property deleted successfully");
+      fetchProperties();
+    } catch (error) {
+      console.error("Error deleting property:", error);
+      message.error("Failed to delete property");
+    }
+  };
+
   return (
     <Layout>
       <AppHeader />
@@ -39,65 +69,84 @@ const ManageProperty = () => {
       <Layout>
         <CustomSider />
         <Content style={{ padding: "0 50px" }}>
-          <List
-            itemLayout="vertical"
-            size="large"
-            dataSource={properties}
-            renderItem={(item) => (
-              <Card className="card">
-                <List.Item key={item.title}>
-                  <div style={{ display: "flex", alignItems: "flex-start" }}>
-                    <img
-                      width={150}
-                      height={150}
-                      alt="logo"
-                      src="https://justatinabit.com/wp-content/uploads/2022/08/justatinabit-nursery-tour-peach-floral-theme-girl-nursery-decor-25.jpg"
-                      className="card-image"
-                    />
-                    <div className="card-content">
-                      <List.Item.Meta
-                        title={
-                          <a href="#" className="card-title">
-                            {item.title}
-                          </a>
+          {loading ? (
+            <div>Loading...</div>
+          ) : properties.length === 0 ? (
+            <div>You don't have any properties yet.</div>
+          ) : (
+            <List
+              itemLayout="vertical"
+              size="large"
+              dataSource={properties}
+              renderItem={(item) => (
+                <Card className="card">
+                  <List.Item key={item.homeId}>
+                    <div style={{ display: "flex", alignItems: "flex-start" }}>
+                      <img
+                        width={150}
+                        height={150}
+                        alt="property"
+                        src={
+                          item.homeImages[0]?.image?.imageUrl ||
+                          "https://via.placeholder.com/150"
                         }
-                        description={
-                          <>
-                            <Tag color="black" className="tag">
-                              Full nội thất
-                            </Tag>
-                            <Tag color="orange" className="tag">
-                              {item.status}
-                            </Tag>
-                            <div className="size">Diện tích: {item.size}</div>
-                            <div className="price">Giá thuê: {item.price}</div>
-                            <div>
-                              <UserOutlined /> Chủ nhà: {item.owner}
-                              <EnvironmentOutlined
-                                style={{ marginLeft: "10px" }}
-                              />{" "}
-                              {item.location}
-                            </div>
-                          </>
-                        }
+                        className="card-image"
                       />
+                      <div className="card-content">
+                        <List.Item.Meta
+                          title={
+                            <a href="#" className="card-title">
+                              {item.name}
+                            </a>
+                          }
+                          description={
+                            <>
+                              <Tag color="black" className="tag">
+                                Full nội thất
+                              </Tag>
+                              <Tag color="orange" className="tag">
+                                {item.status || "Có sẵn"}
+                              </Tag>
+                              <div className="size">Diện tích: {item.size}</div>
+                              <div className="price">
+                                Giá thuê: {item.price}
+                              </div>
+                              <div>
+                                <UserOutlined /> Chủ nhà: {item.owner}
+                                <EnvironmentOutlined
+                                  style={{ marginLeft: "10px" }}
+                                />{" "}
+                                {item.location?.province}
+                              </div>
+                            </>
+                          }
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="tenant-info">
-                    <Avatar icon={<UserOutlined />} /> Người thuê: {item.tenant}
-                    <StarOutlined style={{ marginLeft: "10px" }} />{" "}
-                    {item.rating}
-                    <div className="feedback">
-                      {item.feedback}
-                      <Button type="link" className="feedback-button">
-                        Phản hồi
-                      </Button>
+                    <div className="tenant-info">
+                      <Avatar icon={<UserOutlined />} /> Người thuê:{" "}
+                      {item.tenant || "N/A"}
+                      <StarOutlined style={{ marginLeft: "10px" }} />{" "}
+                      {item.rating || "N/A"}
+                      <div className="feedback">
+                        {item.feedback || "Chưa có phản hồi"}
+                        <Button type="link" className="feedback-button">
+                          Phản hồi
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </List.Item>
-              </Card>
-            )}
-          />
+                    <Button
+                      onClick={() => handleDelete(item.homeId)}
+                      danger
+                      style={{ marginTop: 16 }}
+                    >
+                      Xóa nhà
+                    </Button>
+                  </List.Item>
+                </Card>
+              )}
+            />
+          )}
         </Content>
       </Layout>
       <FooterComponent />

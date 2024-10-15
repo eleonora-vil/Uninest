@@ -107,12 +107,15 @@ const AppHeader = () => {
           Dashboard
         </Menu.Item>
       )}
+
       <Menu.Item key="profile" onClick={() => navigate("/manageProps")}>
         Manage Properties
       </Menu.Item>
+
       <Menu.Item key="profile" onClick={() => navigate("/profile")}>
         Profile
       </Menu.Item>
+
       <Menu.Item key="logout" onClick={handleLogout}>
         Logout
       </Menu.Item>
