@@ -188,8 +188,8 @@ export default function OrderTable() {
                         value={row.amount}
                         displayType="text"
                         thousandSeparator
-                        prefix="$"
-                        decimalScale={2}
+                        suffix=" VNĐ"
+                        decimalScale={0}
                         fixedDecimalScale
                       />
                     </TableCell>

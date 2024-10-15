@@ -425,11 +425,6 @@ export default function AuthPage() {
                         alignItems: "center",
                       }}
                     >
-                      {/* <Checkbox
-                        size="sm"
-                        label="Remember me"
-                        name="persistent"
-                      /> */}
                       <Link
                         level="title-sm"
                         component="button"
