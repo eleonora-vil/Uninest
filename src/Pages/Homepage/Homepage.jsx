@@ -9,13 +9,15 @@ import Typography from "@mui/joy/Typography";
 import Card from "@mui/joy/Card";
 import CardContent from "@mui/joy/CardContent";
 import { CardMedia } from "@mui/material";
-import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Time Icon
-import LocationOnIcon from "@mui/icons-material/LocationOn"; // Location Icon
+// import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Time Icon
+// import LocationOnIcon from "@mui/icons-material/LocationOn"; // Location Icon
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useNavigate } from "react-router-dom";
-import AppHeader from "./Header/Header";
-import FooterComponent from "./Footer/Footer";
-import api from "../config/axios";
+import AppHeader from "../../components/Header/Header";
+import FooterComponent from "../../components/Footer/Footer";
+import api from "../../config/axios";
+import { Link } from "react-router-dom";
+import TruncatedText from "../../utils/TruncatedText";
 export default function HomePage() {
   const navigate = useNavigate();
   const [cardData, setCardData] = React.useState([]); // Store house data
@@ -23,7 +25,7 @@ export default function HomePage() {
   const [error, setError] = React.useState(null); // Handle errors
 
   const handleHomeClick = () => {
-    navigate("/");
+    navigate("/listing");
   };
 
   React.useEffect(() => {
@@ -86,46 +88,64 @@ export default function HomePage() {
   );
 
   const renderCards = (data) => {
-    return data.map((item, index) => (
-      <Card key={index} sx={{ minWidth: 200, marginRight: 2, borderRadius: 5 }}>
-        {item.homeImages && item.homeImages.length > 0 ? (
-          <CardMedia
-            component="img"
-            height="200"
-            image={item.homeImages[0].image?.imageUrl}
-            alt={item.name}
-          />
-        ) : (
-          <CardMedia
-            component="img"
-            height="200"
-            image="/path/to/default/image.jpg"
-            alt="No image available"
-          />
-        )}
-        <CardContent>
-          <Typography variant="h2">{item.name}</Typography>
-          <Typography variant="h10">{item.description}</Typography>
-          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-            <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
-            <Typography variant="body2" color="text.secondary">
-              {item.price}
+    return data.map((item) => (
+      <Link
+        key={item.homeId}
+        to={`/property/${item.homeId}`}
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <Card
+          sx={{
+            minWidth: 200,
+            marginRight: 2,
+            borderRadius: 5,
+            height: "wrap-content",
+          }}
+        >
+          {item.homeImages && item.homeImages.length > 0 ? (
+            <CardMedia
+              component="img"
+              height="200"
+              image={item.homeImages[0].image?.imageUrl}
+              alt={item.name}
+            />
+          ) : (
+            <CardMedia
+              component="img"
+              height="200"
+              image="/path/to/default/image.jpg"
+              alt="No image available"
+            />
+          )}
+          <CardContent>
+            <Typography variant="h2">
+              <TruncatedText text={item.name} maxLength="30" />
             </Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-            <AccessTimeIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
-            <Typography variant="body2" color="text.secondary">
-              {item.postTime}
+            <Typography variant="h10">
+              {item.bedrooms} PN - {item.bathroom} NVS
             </Typography>
-          </Box>
-          <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-            <LocationOnIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
-            <Typography variant="body2" color="text.secondary">
-              {item.postPlace}
-            </Typography>
-          </Box>
-        </CardContent>
-      </Card>
+            <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+              <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
+              <Typography variant="body2" color="text.secondary">
+                {item.price}/Tháng
+              </Typography>
+            </Box>
+            {/* Removed postTime and postPlace as they're not in the API response */}
+            {/* <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+          <AccessTimeIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
+          <Typography variant="body2" color="text.secondary">
+            {item.postTime}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
+          <LocationOnIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
+          <Typography variant="body2" color="text.secondary">
+            {item.postPlace}
+          </Typography>
+        </Box> */}
+          </CardContent>
+        </Card>
+      </Link>
     ));
   };
 
@@ -158,11 +178,12 @@ export default function HomePage() {
             display: "flex",
             flexDirection: "column",
             bgcolor: "background.level1",
+            overflow: "hidden",
           }}
         >
           <Box
             sx={{
-              height: "70vh",
+              height: "60vh",
               position: "relative",
               backgroundImage:
                 "url(https://images.pexels.com/photos/2988860/pexels-photo-2988860.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)",
@@ -182,6 +203,7 @@ export default function HomePage() {
                 color: "#fff",
                 textAlign: "center",
                 mb: 4,
+                width: "50%",
               }}
             >
               Cùng tìm kiếm một căn trọ hoàn hảo cho bạn với UNINEST
@@ -281,7 +303,7 @@ export default function HomePage() {
           {/* Existing Main Content */}
           <Box
             sx={{
-              mt: "20vh",
+              mt: "15vh",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -293,32 +315,101 @@ export default function HomePage() {
             <Box
               sx={{
                 width: { xs: "90%", sm: "80%", md: "60%", lg: "45%" },
-                height: "350px",
+                height: "100%",
                 bgcolor: "#fff",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 p: 3,
-                display: "flex",
+                display: "block",
+
                 overflowX: "auto",
                 gap: 2,
               }}
             >
-              {renderCards(cardData)}
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#343131",
+                    fontWeight: "bold",
+                    mb: 2,
+                  }}
+                >
+                  Cho thuê trong khu vực của bạn
+                </Typography>
+                <Link
+                  underline="none"
+                  to={`/listing`}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Xem thêm <span style={{ marginLeft: "4px" }}>&gt;</span>
+                </Link>
+              </Box>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  overflowX: "auto",
+                  gap: 2,
+                }}
+              >
+                {renderCards(cardData)}
+              </Box>
             </Box>
 
             {/* Second Box with Scrollable Cards */}
             <Box
               sx={{
                 width: { xs: "90%", sm: "80%", md: "60%", lg: "45%" },
-                height: "350px",
+                height: "100%",
                 bgcolor: "#fff",
                 boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
                 p: 3,
-                display: "flex",
+                display: "block",
+
                 overflowX: "auto",
                 gap: 2,
               }}
             >
-              {renderCards(cardData)}
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#343131",
+                    fontWeight: "bold",
+                    mb: 2,
+                  }}
+                >
+                  Cho thuê
+                </Typography>
+                <Link
+                  href="http://localhost:5173/listing" // Replace with your desired URL
+                  underline="none"
+                  to={`/listing`}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Xem thêm <span style={{ marginLeft: "4px" }}>&gt;</span>
+                </Link>
+              </Box>
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  overflowX: "auto",
+                  gap: 2,
+                }}
+              >
+                {renderCards(cardData)}
+              </Box>
             </Box>
           </Box>
         </Box>

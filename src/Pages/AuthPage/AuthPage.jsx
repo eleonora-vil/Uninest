@@ -18,8 +18,8 @@ import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import api from "../config/axios";
-import Uninest from "../assets/Uninest.png";
+import api from "../../config/axios";
+import Uninest from "../../assets/Uninest.png";
 
 // const customTheme = extendTheme({ defaultColorScheme: "dark" });
 
@@ -67,23 +67,67 @@ export default function AuthPage() {
       switch (authMode) {
         case "signin": {
           try {
+            console.log("Attempting login...");
             const loginResponse = await api.post("api/Auth/Login", {
               email: formData.get("email"),
               password: formData.get("password"),
             });
+            console.log("Login response:", loginResponse);
 
-            // If we reach here, assume login was successful
-            const { token, ...userData } = loginResponse.data;
-            localStorage.setItem("token", token);
-            localStorage.setItem("user", JSON.stringify(userData));
-            navigate("/");
+            // Check if the login was successful and the token is present
+            if (
+              loginResponse.data.success &&
+              loginResponse.data.result.accessToken
+            ) {
+              const token = loginResponse.data.result.accessToken;
+
+              // Store the token in localStorage
+              localStorage.setItem("token", token);
+
+              // Fetch user details
+              try {
+                const userResponse = await api.get(
+                  `api/User/by-email?email=${formData.get("email")}`
+                );
+                const userData = userResponse.data.data;
+
+                // Store user data in localStorage
+                localStorage.setItem("user", JSON.stringify(userData));
+                console.log(userData);
+                // Navigate to home page
+                navigate("/");
+              } catch (userError) {
+                console.error("Error fetching user details:", userError);
+                alert(
+                  "Login successful, but failed to fetch user details. Please try again."
+                );
+              }
+            } else {
+              // Handle case where login was successful but no token was received
+              alert(
+                "Login successful, but no access token received. Please try again."
+              );
+            }
           } catch (error) {
             if (error.response && error.response.status === 401) {
-              // This is a special case where the account exists but needs verification
-              setEmail(formData.get("email"));
-              toggleAuthMode("verifyOTP");
+              // Check the specific error message or code from the backend
+              const errorMessage = error.response.data.message;
+              if (
+                errorMessage ===
+                "Please verify your email. An OTP has been sent to your email."
+              ) {
+                setEmail(formData.get("email"));
+                toggleAuthMode("verifyOTP");
+              } else if (errorMessage === "Invalid password.") {
+                alert("Invalid password. Please try again.");
+              } else if (errorMessage === "Invalid email.") {
+                alert("Invalid email. Please try again.");
+              } else {
+                // Handle other types of 401 errors
+                alert("Authentication failed. Please try again.");
+              }
             } else {
-              // Handle other errors (invalid credentials, server errors, etc.)
+              // Handle other errors (server errors, network issues, etc.)
               console.error("Login error:", error);
               alert(
                 error.response?.data?.message ||
@@ -109,7 +153,7 @@ export default function AuthPage() {
             setEmail(formData.get("email"));
             toggleAuthMode("verifyOTP");
           } else {
-            toggleAuthMode("signIn");
+            toggleAuthMode("signin");
           }
           break;
         }
@@ -381,11 +425,6 @@ export default function AuthPage() {
                         alignItems: "center",
                       }}
                     >
-                      {/* <Checkbox
-                        size="sm"
-                        label="Remember me"
-                        name="persistent"
-                      /> */}
                       <Link
                         level="title-sm"
                         component="button"

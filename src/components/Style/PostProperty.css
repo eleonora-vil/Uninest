@@ -1,0 +1,52 @@
+/* Ensure the entire page uses border-box for sizing */
+* {
+    box-sizing: border-box;
+  }
+  
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden; /* Prevent horizontal overflow */
+  }
+  
+  .page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%; /* Ensure full width */
+  }
+  
+  header, footer {
+    width: 100%; /* Full width */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+  }
+  
+  .content-wrapper {
+    flex: 1;
+    padding: 20px; /* Add padding for spacing */
+  }
+  
+  .form-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+  }
+  
+  .ant-form-item {
+    margin-bottom: 24px;
+  }
+  
+  .ant-btn-primary {
+    background-color: #ff7f50;
+    border-color: #ff7f50;
+  }
+  
+  .ant-btn-primary:hover {
+    background-color: #ff4500;
+    border-color: #ff4500;
+  }
+  

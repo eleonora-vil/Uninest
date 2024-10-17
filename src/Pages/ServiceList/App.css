@@ -1,0 +1,51 @@
+.header {
+  background-color: #fff;
+  padding: 0 20px;
+}
+
+.header .logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #ff5722;
+}
+
+.site-layout-background {
+  background: #fff;
+}
+
+.card {
+  margin-bottom: 20px;
+}
+
+.card .ant-btn {
+  margin-left: auto;
+}
+
+/* styles.css */
+
+.gradient-button {
+  background: linear-gradient(90deg, #fcd25e,#fdb859, #fc9a53);
+  color: black;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-right: 10px;
+}
+
+.gradient-button:hover {
+  background: linear-gradient(90deg, #fcd25e,#fdb859, #fc9a53);
+}
+
+
+.scrollable-buttons {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.custom-button {
+  color: #4259b3; /* Custom text color */
+ 
+  margin-right: 8px;
+}

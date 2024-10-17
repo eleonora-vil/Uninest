@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Layout, Menu, Avatar, Dropdown, Button, Input, Space } from "antd";
 import {
   BellOutlined,
   MessageOutlined,
-  FileOutlined,
   DownOutlined,
   SearchOutlined,
   MenuOutlined,
   UploadOutlined,
   UserOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import IconButton from "@mui/joy/IconButton";
 import Uninest from "../../assets/Uninest.png";
@@ -27,32 +27,12 @@ const categories = [
       {
         label: "Thuê nhà",
         key: "setting:1",
-        navigate: "/renting",
-        // children: [
-        //   {
-        //     label: "Option 1",
-        //     key: "setting:1",
-        //   },
-        //   {
-        //     label: "Option 2",
-        //     key: "setting:2",
-        //   },
-        // ],
+        navigate: "/listing",
       },
       {
         label: "Dịch vụ bên thứ ba",
         key: "setting:2",
         navigate: "/services",
-        // children: [
-        //   {
-        //     label: "Option 3",
-        //     key: "setting:3",
-        //   },
-        //   {
-        //     label: "Option 4",
-        //     key: "setting:4",
-        //   },
-        // ],
       },
     ],
   },
@@ -60,11 +40,13 @@ const categories = [
 
 const AppHeader = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [fullName, setFullName] = useState("");
   const [current, setCurrent] = useState("mail");
+  const [userRole, setUserRole] = useState(""); // New state for user role
+  const [userData, setUserData] = useState(null);
+  const [userWallet, setUserWallet] = useState("");
 
   const onClick = (e) => {
     console.log("click ", e);
@@ -78,26 +60,33 @@ const AppHeader = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const storedFullName = localStorage.getItem("fullName");
+    const storedUserData = localStorage.getItem("user");
     setIsLoggedIn(!!token);
-    setFullName(storedFullName || "");
 
-    if (token && storedFullName) {
-      setAvatarUrl(
-        `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
-          storedFullName
-        )}`
-      );
+    if (storedUserData) {
+      const parsedUserData = JSON.parse(storedUserData);
+      setUserData(parsedUserData);
+      setFullName(parsedUserData.fullName || "");
+      setUserRole(parsedUserData.roleID.toString()); // Convert to string to match your condition
+      setUserWallet(parsedUserData.wallet);
+
+      if (parsedUserData.fullName) {
+        setAvatarUrl(
+          `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
+            parsedUserData.fullName
+          )}`
+        );
+      }
     }
-  }, [navigate, location.pathname]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("fullName");
-    localStorage.clear();
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
+    setUserData(null);
     setFullName("");
+    setUserRole("");
     toast.info("Logged out", {
       position: "top-right",
       autoClose: 3000,
@@ -110,17 +99,25 @@ const AppHeader = () => {
       transition: Bounce,
     });
     navigate("/");
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
   };
 
   const userMenu = (
     <Menu>
-      <Menu.Item key="1" onClick={() => navigate("/profile")}>
+      {userData && userData.roleID === 1 && (
+        <Menu.Item key="dashboard" onClick={() => navigate("/dashboard")}>
+          Dashboard
+        </Menu.Item>
+      )}
+
+      <Menu.Item key="profile" onClick={() => navigate("/manageProps")}>
+        Manage Properties
+      </Menu.Item>
+
+      <Menu.Item key="profile" onClick={() => navigate("/profile")}>
         Profile
       </Menu.Item>
-      <Menu.Item key="2" onClick={handleLogout}>
+
+      <Menu.Item key="logout" onClick={handleLogout}>
         Logout
       </Menu.Item>
     </Menu>
@@ -140,6 +137,11 @@ const AppHeader = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        position: "sticky",
+        top: 0,
+        left: 0,
+        zIndex: 1000,
+        height: 64, // Specify a fixed height
       }}
     >
       <IconButton sx={{ padding: 2, width: 64, height: 64 }}>
@@ -169,14 +171,14 @@ const AppHeader = () => {
       <Space size="middle">
         <Button type="text" icon={<BellOutlined />} size="large" />
         <Button type="text" icon={<MessageOutlined />} size="large" />
-        <Button type="text" icon={<FileOutlined />} size="large" />
+        <Button type="text" icon={<WalletOutlined />} size="large" />
       </Space>
 
-      {isLoggedIn ? (
+      {userData ? (
         <Dropdown overlay={userMenu} placement="bottomRight" size="large">
           <Space style={{ cursor: "pointer" }}>
             <Avatar src={avatarUrl} />
-            <span>{fullName}</span>
+            <span>{userData.fullName}</span>
             <DownOutlined />
           </Space>
         </Dropdown>
@@ -199,6 +201,7 @@ const AppHeader = () => {
         style={{ marginLeft: "16px" }}
         danger
         size="large"
+        onClick={() => navigate("/posting")}
       >
         Đăng tin
       </Button>
