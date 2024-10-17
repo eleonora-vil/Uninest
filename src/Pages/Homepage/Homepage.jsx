@@ -127,7 +127,7 @@ export default function HomePage() {
             <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
               <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
               <Typography variant="body2" color="text.secondary">
-                {item.price}.000đ/Tháng
+                {item.price}/Tháng
               </Typography>
             </Box>
             {/* Removed postTime and postPlace as they're not in the API response */}
