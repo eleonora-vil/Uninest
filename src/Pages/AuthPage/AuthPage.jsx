@@ -93,7 +93,7 @@ export default function AuthPage() {
 
                 // Store user data in localStorage
                 localStorage.setItem("user", JSON.stringify(userData));
-
+                console.log(userData);
                 // Navigate to home page
                 navigate("/");
               } catch (userError) {

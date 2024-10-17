@@ -18,7 +18,6 @@ import FooterComponent from "../../components/Footer/Footer";
 import api from "../../config/axios";
 import { Link } from "react-router-dom";
 import TruncatedText from "../../utils/TruncatedText";
-import { decorate } from "react-toastify/addons/use-notification-center";
 export default function HomePage() {
   const navigate = useNavigate();
   const [cardData, setCardData] = React.useState([]); // Store house data

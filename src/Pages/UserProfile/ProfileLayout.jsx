@@ -1,5 +1,5 @@
 // src/ProfileLayout.js
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Layout,
   Form,
@@ -10,15 +10,18 @@ import {
   Col,
   DatePicker,
   message,
+  Card,
 } from "antd";
 import moment from "moment";
 import userService from "./userService";
+import TopUpForm from "./TopUpForm";
 
 const { Content } = Layout;
 const { Option } = Select;
 
 const ProfileLayout = ({ userData, onUpdateSuccess }) => {
   const [form] = Form.useForm();
+  const [isTopUpModalVisible, setIsTopUpModalVisible] = useState(false);
 
   useEffect(() => {
     if (userData) {
@@ -42,6 +45,23 @@ const ProfileLayout = ({ userData, onUpdateSuccess }) => {
           (error.response?.data?.message || error.message)
       );
     }
+  };
+
+  const showTopUpModal = () => {
+    setIsTopUpModalVisible(true);
+  };
+
+  const handleTopUpCancel = () => {
+    setIsTopUpModalVisible(false);
+  };
+
+  const handleTopUpSuccess = (successMessage) => {
+    setIsTopUpModalVisible(false);
+    message.success(successMessage);
+    // Refresh the page after a short delay
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
   };
 
   return (
@@ -99,6 +119,35 @@ const ProfileLayout = ({ userData, onUpdateSuccess }) => {
             </Button>
           </Form.Item>
         </Form>
+
+        {/* New Section for Account Details */}
+        <div style={{ marginTop: "40px" }}>
+          <h3>Chi tiết tài khoản</h3>
+          <Card
+            style={{
+              background: "#333",
+              color: "#fff",
+              borderRadius: "8px",
+              marginBottom: "20px",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>
+                <h4>TỔNG TÀI KHOẢN</h4>
+                <p style={{ fontSize: "24px" }}>
+                  {userData?.wallet || 0}{" "}
+                  <span style={{ fontSize: "24px" }}>VND</span>
+                </p>
+              </div>
+              <Button onClick={showTopUpModal}>+Nạp thêm</Button>
+            </div>
+          </Card>
+        </div>
+        <TopUpForm
+          visible={isTopUpModalVisible}
+          onSuccess={handleTopUpSuccess}
+          onClose={handleTopUpCancel}
+        />
       </Content>
     </Layout>
   );

@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Layout, Menu, Avatar, Dropdown, Button, Input, Space } from "antd";
 import {
   BellOutlined,
   MessageOutlined,
-  FileOutlined,
   DownOutlined,
   SearchOutlined,
   MenuOutlined,
   UploadOutlined,
   UserOutlined,
+  WalletOutlined,
 } from "@ant-design/icons";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import IconButton from "@mui/joy/IconButton";
 import Uninest from "../../assets/Uninest.png";
@@ -40,13 +40,13 @@ const categories = [
 
 const AppHeader = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [fullName, setFullName] = useState("");
   const [current, setCurrent] = useState("mail");
   const [userRole, setUserRole] = useState(""); // New state for user role
   const [userData, setUserData] = useState(null);
+  const [userWallet, setUserWallet] = useState("");
 
   const onClick = (e) => {
     console.log("click ", e);
@@ -68,6 +68,7 @@ const AppHeader = () => {
       setUserData(parsedUserData);
       setFullName(parsedUserData.fullName || "");
       setUserRole(parsedUserData.roleID.toString()); // Convert to string to match your condition
+      setUserWallet(parsedUserData.wallet);
 
       if (parsedUserData.fullName) {
         setAvatarUrl(
@@ -170,7 +171,7 @@ const AppHeader = () => {
       <Space size="middle">
         <Button type="text" icon={<BellOutlined />} size="large" />
         <Button type="text" icon={<MessageOutlined />} size="large" />
-        <Button type="text" icon={<FileOutlined />} size="large" />
+        <Button type="text" icon={<WalletOutlined />} size="large" />
       </Space>
 
       {userData ? (
