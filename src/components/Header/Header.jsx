@@ -329,8 +329,12 @@ const AppHeader = () => {
         confirmLoading={isLoading}
       >
         <p>Would you like to subscribe to our membership program?</p>
-        <p>The membership fee will be deducted from your wallet.</p>
+        <p>
+          The membership fee will be deducted from your wallet. The amount will
+          be 200.000đ
+        </p>
         <p>Auto-renewal will be enabled by default.</p>
+        <p>Membership will last 3 months</p>
       </Modal>
 
       <TopUpForm

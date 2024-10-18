@@ -42,8 +42,6 @@ const UserProfile = () => {
       if (response.data && response.data.success && response.data.result) {
         const userData = response.data.result;
         setUserData(userData);
-        // Since isPhoneVisible is not in the response, we'll remove this line
-        // setIsPhoneVisible(userData.isPhoneVisible || false);
         form.setFieldsValue({
           ...userData,
           birthDate: userData.birthDate ? moment(userData.birthDate) : null,
@@ -113,36 +111,6 @@ const UserProfile = () => {
       );
     }
   };
-
-  // const handlePhoneVisibilityChange = async (checked) => {
-  //   try {
-  //     const response = await userService.updatePhoneVisibility(checked);
-  //     if (response.data.success) {
-  //       setIsPhoneVisible(checked);
-  //       message.success("Phone visibility updated successfully");
-  //     }
-  //   } catch (error) {
-  //     message.error("Failed to update phone visibility");
-  //   }
-  // };
-
-  // const showDeleteModal = () => {
-  //   setIsDeleteModalVisible(true);
-  // };
-
-  // const handleDeleteAccount = async () => {
-  //   try {
-  //     const response = await userService.deleteAccount();
-  //     if (response.data.success) {
-  //       message.success("Account deleted successfully");
-  //       // Redirect to home page or login page
-  //       navigate("/");
-  //     }
-  //   } catch (error) {
-  //     message.error("Failed to delete account");
-  //   }
-  //   setIsDeleteModalVisible(false);
-  // };
 
   const renderContent = () => {
     switch (selectedMenuItem) {
