@@ -5,10 +5,10 @@ import { Button, Modal, Typography, Space, InputNumber, message } from "antd";
 
 const { Title } = Typography;
 
-const TopUpForm = ({ visible, onSuccess, onClose }) => {
-  const [amount, setAmount] = useState("");
+const TopUpForm = ({ visible, onSuccess, onClose, initialAmount = 0 }) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [amount, setAmount] = useState(initialAmount.toString());
   const [payOSConfig, setPayOSConfig] = useState({
     RETURN_URL: window.location.origin,
     ELEMENT_ID: "embedded-payment-container",
@@ -18,6 +18,11 @@ const TopUpForm = ({ visible, onSuccess, onClose }) => {
       onSuccess("Nạp tiền thành công");
     },
   });
+
+  // pass money needed for use something
+  useEffect(() => {
+    setAmount(initialAmount.toString());
+  }, [initialAmount]);
 
   const { open, exit } = usePayOS(payOSConfig);
 

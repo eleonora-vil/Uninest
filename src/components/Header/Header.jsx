@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { Layout, Menu, Avatar, Dropdown, Button, Input, Space } from "antd";
+import {
+  Layout,
+  Menu,
+  Avatar,
+  Dropdown,
+  Button,
+  Input,
+  Space,
+  Badge,
+  Modal,
+  message,
+} from "antd";
 import {
   BellOutlined,
   MessageOutlined,
@@ -14,6 +25,8 @@ import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import IconButton from "@mui/joy/IconButton";
 import Uninest from "../../assets/Uninest.png";
+import api from "../../config/axios";
+import TopUpForm from "../../Pages/UserProfile/TopUpForm"; // Assuming you have this component
 
 const { Header } = Layout;
 // const { SubMenu } = Menu;
@@ -47,6 +60,98 @@ const AppHeader = () => {
   const [userRole, setUserRole] = useState(""); // New state for user role
   const [userData, setUserData] = useState(null);
   const [userWallet, setUserWallet] = useState("");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isTopUpModalVisible, setIsTopUpModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [requiredAmount, setRequiredAmount] = useState(0);
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const showSubscribeModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleSubscribe = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.post("/api/User/register-membership", {
+        autoRenew: true,
+      });
+
+      if (response.data && response.data.success) {
+        // Update the local user data
+        setUserData((prevData) => ({
+          ...prevData,
+          ...response.data.result,
+          isActiveMember: true,
+          isMember: true,
+        }));
+
+        message.success("Successfully subscribed to membership!");
+        setIsModalVisible(false);
+      } else {
+        throw new Error(response.data.errorMessage || "Failed to subscribe");
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        const errorMessage = error.response.data.errorMessage;
+        if (
+          errorMessage &&
+          errorMessage.includes("Insufficient funds in wallet")
+        ) {
+          const match = errorMessage.match(
+            /Required: (\d+), Available: (\d+(\.\d+)?)/
+          );
+          if (match) {
+            const required = parseFloat(match[1]);
+            const available = parseFloat(match[2]);
+            const needed = required - available;
+            setRequiredAmount(needed);
+            Modal.confirm({
+              title: "Insufficient Funds",
+              content: `You need ${formatCurrency(
+                needed
+              )} more in your wallet to subscribe. Would you like to top up your account?`,
+              onOk() {
+                setIsTopUpModalVisible(true);
+              },
+            });
+          } else {
+            message.error(
+              "Insufficient funds in wallet. Please top up your account."
+            );
+          }
+        } else {
+          message.error(errorMessage || "An error occurred. Please try again.");
+        }
+      } else {
+        message.error("An error occurred. Please try again.");
+      }
+      console.error("Subscription error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTopUpCancel = () => {
+    setIsTopUpModalVisible(false);
+  };
+
+  const handleTopUpSuccess = (successMessage) => {
+    setIsTopUpModalVisible(false);
+    message.success(successMessage);
+    // Optionally refresh user data here
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  };
 
   const onClick = (e) => {
     console.log("click ", e);
@@ -179,6 +284,17 @@ const AppHeader = () => {
           <Space style={{ cursor: "pointer" }}>
             <Avatar src={avatarUrl} />
             <span>{userData.fullName}</span>
+            {userData.isActiveMember ? (
+              <Badge
+                status="success"
+                text="Member"
+                style={{ fontSize: "12px" }}
+              />
+            ) : (
+              <Button type="link" size="small" onClick={showSubscribeModal}>
+                Subscribe
+              </Button>
+            )}
             <DownOutlined />
           </Space>
         </Dropdown>
@@ -205,6 +321,24 @@ const AppHeader = () => {
       >
         Đăng tin
       </Button>
+      <Modal
+        title="Subscribe to Membership"
+        visible={isModalVisible}
+        onOk={handleSubscribe}
+        onCancel={() => setIsModalVisible(false)}
+        confirmLoading={isLoading}
+      >
+        <p>Would you like to subscribe to our membership program?</p>
+        <p>The membership fee will be deducted from your wallet.</p>
+        <p>Auto-renewal will be enabled by default.</p>
+      </Modal>
+
+      <TopUpForm
+        visible={isTopUpModalVisible}
+        onSuccess={handleTopUpSuccess}
+        onClose={handleTopUpCancel}
+        initialAmount={requiredAmount}
+      />
     </Header>
   );
 };

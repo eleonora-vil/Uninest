@@ -26,8 +26,8 @@ const UserProfile = () => {
   const [userData, setUserData] = useState(null);
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
-  const [isPhoneVisible, setIsPhoneVisible] = useState(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  // const [isPhoneVisible, setIsPhoneVisible] = useState(false);
+  // const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const navigate = useNavigate(); // Use useNavigate hook
 
   useEffect(() => {
@@ -114,35 +114,35 @@ const UserProfile = () => {
     }
   };
 
-  const handlePhoneVisibilityChange = async (checked) => {
-    try {
-      const response = await userService.updatePhoneVisibility(checked);
-      if (response.data.success) {
-        setIsPhoneVisible(checked);
-        message.success("Phone visibility updated successfully");
-      }
-    } catch (error) {
-      message.error("Failed to update phone visibility");
-    }
-  };
+  // const handlePhoneVisibilityChange = async (checked) => {
+  //   try {
+  //     const response = await userService.updatePhoneVisibility(checked);
+  //     if (response.data.success) {
+  //       setIsPhoneVisible(checked);
+  //       message.success("Phone visibility updated successfully");
+  //     }
+  //   } catch (error) {
+  //     message.error("Failed to update phone visibility");
+  //   }
+  // };
 
-  const showDeleteModal = () => {
-    setIsDeleteModalVisible(true);
-  };
+  // const showDeleteModal = () => {
+  //   setIsDeleteModalVisible(true);
+  // };
 
-  const handleDeleteAccount = async () => {
-    try {
-      const response = await userService.deleteAccount();
-      if (response.data.success) {
-        message.success("Account deleted successfully");
-        // Redirect to home page or login page
-        navigate("/");
-      }
-    } catch (error) {
-      message.error("Failed to delete account");
-    }
-    setIsDeleteModalVisible(false);
-  };
+  // const handleDeleteAccount = async () => {
+  //   try {
+  //     const response = await userService.deleteAccount();
+  //     if (response.data.success) {
+  //       message.success("Account deleted successfully");
+  //       // Redirect to home page or login page
+  //       navigate("/");
+  //     }
+  //   } catch (error) {
+  //     message.error("Failed to delete account");
+  //   }
+  //   setIsDeleteModalVisible(false);
+  // };
 
   const renderContent = () => {
     switch (selectedMenuItem) {
@@ -223,7 +223,7 @@ const UserProfile = () => {
                 </Button>
               </Form.Item>
             </Form>
-            <div
+            {/* <div
               style={{
                 marginTop: "24px",
                 padding: "16px",
@@ -239,8 +239,8 @@ const UserProfile = () => {
                 checked={isPhoneVisible}
                 onChange={handlePhoneVisibilityChange}
               />
-            </div>
-            <Button
+            </div> */}
+            {/* <Button
               danger
               style={{
                 marginTop: "16px",
@@ -262,7 +262,7 @@ const UserProfile = () => {
                 Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể
                 hoàn tác.
               </p>
-            </Modal>
+            </Modal> */}
           </div>
         );
       default:

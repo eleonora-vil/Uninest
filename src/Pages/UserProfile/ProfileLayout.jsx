@@ -64,6 +64,14 @@ const ProfileLayout = ({ userData, onUpdateSuccess }) => {
     }, 1500);
   };
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   return (
     <Layout style={{ minHeight: "100vh", background: "#ffff" }}>
       <Content style={{ padding: "20px", maxWidth: "1500px" }}>
@@ -135,11 +143,10 @@ const ProfileLayout = ({ userData, onUpdateSuccess }) => {
               <div>
                 <h4>TỔNG TÀI KHOẢN</h4>
                 <p style={{ fontSize: "24px" }}>
-                  {userData?.wallet || 0}{" "}
-                  <span style={{ fontSize: "24px" }}>VND</span>
+                  {formatCurrency(userData?.wallet || 0)}{" "}
                 </p>
               </div>
-              <Button onClick={showTopUpModal}>+Nạp thêm</Button>
+              <Button onClick={showTopUpModal}>+ Nạp thêm</Button>
             </div>
           </Card>
         </div>

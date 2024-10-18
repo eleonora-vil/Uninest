@@ -19,13 +19,13 @@ const userService = {
     return api.put("/api/User/change-password", passwordData);
   },
 
-  updatePhoneVisibility: async (isVisible) => {
-    return api.put("/api/User/update-phone-visibility", { isVisible });
-  },
+  // updatePhoneVisibility: async (isVisible) => {
+  //   return api.put("/api/User/update-phone-visibility", { isVisible });
+  // },
 
-  deleteAccount: async () => {
-    return api.delete("/api/User/delete-account");
-  },
+  // deleteAccount: async () => {
+  //   return api.delete("/api/User/delete-account");
+  // },
 };
 
 export default userService;
