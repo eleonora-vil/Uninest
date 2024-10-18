@@ -67,7 +67,7 @@ const AppHeader = () => {
       const parsedUserData = JSON.parse(storedUserData);
       setUserData(parsedUserData);
       setFullName(parsedUserData.fullName || "");
-      setUserRole(parsedUserData.roleID.toString()); // Convert to string to match your condition
+      // setUserRole(parsedUserData.roleID.toString()); // Convert to string to match your condition
       setUserWallet(parsedUserData.wallet);
 
       if (parsedUserData.fullName) {
