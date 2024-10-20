@@ -175,7 +175,11 @@ const AppHeader = () => {
       setUserRole(parsedUserData.roleID.toString()); // Convert to string to match your condition
       setUserWallet(parsedUserData.wallet);
 
-      if (parsedUserData.fullName) {
+      // Check if the user has an avatarUrl
+      if (parsedUserData.avatarUrl) {
+        setAvatarUrl(parsedUserData.avatarUrl);
+      } else if (parsedUserData.fullName) {
+        // If no avatarUrl, generate one based on the fullName
         setAvatarUrl(
           `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
             parsedUserData.fullName

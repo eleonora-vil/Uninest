@@ -1,4 +1,4 @@
-import api from "../../config/axios"; // Assuming the file you provided is named api.js
+import api from "../../config/axios";
 
 const userService = {
   getUserProfile: async () => {
@@ -17,6 +17,18 @@ const userService = {
 
   changePassword: async (passwordData) => {
     return api.put("/api/User/change-password", passwordData);
+  },
+
+  updateUserImage: async (file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const response = await api.put("/api/User/UpdateUserImage", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
   },
 };
 

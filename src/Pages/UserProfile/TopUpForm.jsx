@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePayOS } from "payos-checkout";
 import api from "../../config/axios";
-import { Button, Modal, Typography, Space, InputNumber, message } from "antd";
-
-const { Title } = Typography;
+import { Button, Modal, Space, InputNumber, message } from "antd";
 
 const TopUpForm = ({ visible, onSuccess, onClose, initialAmount = 0 }) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
