@@ -232,7 +232,48 @@ const AppHeader = () => {
     </Menu>
   );
 
+  const fetchLatestUserData = async () => {
+    try {
+      const storedUserData = JSON.parse(localStorage.getItem("user"));
+      if (!storedUserData || !storedUserData.email) {
+        console.error("No user email found in localStorage");
+        return;
+      }
+
+      const response = await api.get(
+        `api/User/by-email?email=${encodeURIComponent(storedUserData.email)}`
+      );
+
+      if (response.data.success) {
+        const latestUserData = response.data.data;
+
+        // Update state
+        setUserData(latestUserData);
+        setFullName(latestUserData.fullName || "");
+        setUserRole(latestUserData.roleID.toString());
+        setUserWallet(latestUserData.wallet);
+        setAvatarUrl(
+          latestUserData.avatarUrl ||
+            `https://api.dicebear.com/8.x/pixel-art/svg?seed=${encodeURIComponent(
+              latestUserData.fullName
+            )}`
+        );
+
+        // Update localStorage
+        localStorage.setItem("user", JSON.stringify(latestUserData));
+
+        console.log("User data updated successfully");
+      } else {
+        throw new Error("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.error("Error fetching latest user data:", error);
+      // Optionally, show an error message to the user
+    }
+  };
+
   const handleHomeClick = () => {
+    fetchLatestUserData();
     navigate("/");
   };
 
