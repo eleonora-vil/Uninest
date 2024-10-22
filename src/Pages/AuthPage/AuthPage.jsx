@@ -27,14 +27,13 @@ export default function AuthPage() {
   // 'signin', 'signup', or 'forgotpassword'
   const [authMode, setAuthMode] = React.useState("signin");
   const [showPassword, setShowPassword] = React.useState(false);
-
   const [email, setEmail] = React.useState("");
-
   const navigate = useNavigate();
 
   const handleTogglePassword = () => {
     setShowPassword((prev) => !prev);
   };
+
   const toggleAuthMode = (mode) => {
     setAuthMode(mode);
   };
@@ -53,48 +52,36 @@ export default function AuthPage() {
     </IconButton>
   );
 
-  // const [anchorElUser, setAnchorElUser] = React.useState(null);
-
   const handleHomeClick = () => {
     navigate("/");
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Prevent form from refreshing the page
     const formData = new FormData(event.currentTarget);
 
     try {
       switch (authMode) {
         case "signin": {
           try {
-            console.log("Attempting login...");
             const loginResponse = await api.post("api/Auth/Login", {
               email: formData.get("email"),
               password: formData.get("password"),
             });
-            console.log("Login response:", loginResponse);
 
-            // Check if the login was successful and the token is present
             if (
               loginResponse.data.success &&
               loginResponse.data.result.accessToken
             ) {
               const token = loginResponse.data.result.accessToken;
-
-              // Store the token in localStorage
               localStorage.setItem("token", token);
 
-              // Fetch user details
               try {
                 const userResponse = await api.get(
                   `api/User/by-email?email=${formData.get("email")}`
                 );
                 const userData = userResponse.data.data;
-
-                // Store user data in localStorage
                 localStorage.setItem("user", JSON.stringify(userData));
-                console.log(userData);
-                // Navigate to home page
                 navigate("/");
               } catch (userError) {
                 console.error("Error fetching user details:", userError);
@@ -103,31 +90,27 @@ export default function AuthPage() {
                 );
               }
             } else {
-              // Handle case where login was successful but no token was received
               alert(
                 "Login successful, but no access token received. Please try again."
               );
             }
           } catch (error) {
             if (error.response && error.response.status === 401) {
-              // Check the specific error message or code from the backend
               const errorMessage = error.response.data.message;
               if (
                 errorMessage ===
                 "Please verify your email. An OTP has been sent to your email."
               ) {
                 setEmail(formData.get("email"));
-                toggleAuthMode("verifyOTP");
+                toggleAuthMode("verifyOTP"); // Switch to OTP verification mode
               } else if (errorMessage === "Invalid password.") {
                 alert("Invalid password. Please try again.");
               } else if (errorMessage === "Invalid email.") {
                 alert("Invalid email. Please try again.");
               } else {
-                // Handle other types of 401 errors
                 alert("Authentication failed. Please try again.");
               }
             } else {
-              // Handle other errors (server errors, network issues, etc.)
               console.error("Login error:", error);
               alert(
                 error.response?.data?.message ||
@@ -151,7 +134,7 @@ export default function AuthPage() {
           });
           if (signupResponse.data.status === "inactive") {
             setEmail(formData.get("email"));
-            toggleAuthMode("verifyOTP");
+            toggleAuthMode("verifyOTP"); // Switch to OTP verification mode
           } else {
             toggleAuthMode("signin");
           }
@@ -170,7 +153,7 @@ export default function AuthPage() {
         case "verifyOTP": {
           try {
             const otpResponse = await api.post("api/User/SubmitOTP", {
-              email: email, // Use the email from state
+              email: email,
               otp: formData.get("otp"),
             });
 
@@ -197,6 +180,7 @@ export default function AuthPage() {
       alert(err.response?.data || "An error occurred");
     }
   };
+
   const handleSendOTP = async () => {
     try {
       await api.post("api/Auth/ResendOTP", { email: email });
@@ -206,6 +190,7 @@ export default function AuthPage() {
       alert("Failed to send OTP. Please try again.");
     }
   };
+
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
