@@ -152,6 +152,13 @@ const PostProperty = () => {
         setIsTopUpModalVisible(true);
       }
     }
+    if (choice === "wallet") {
+      if (price <= getUserWalletLocalStorage()) {
+        await onFinish(form.getFieldsValue());
+      } else {
+        setIsTopUpModalVisible(true);
+      }
+    }
   };
 
   const calculatePostingFee = (values) => {
@@ -284,6 +291,7 @@ const PostProperty = () => {
         userData.wallet -= 20000;
         localStorage.setItem("user", JSON.stringify(userData));
         await updateUserWallet(20000);
+        await createListing();
         return true;
       } else {
         throw new Error(
