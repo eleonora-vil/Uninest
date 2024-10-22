@@ -143,7 +143,6 @@ const PostProperty = () => {
     setIsMembershipModalVisible(false);
     if (choice === "member") {
       if (200000 <= getUserWalletLocalStorage()) {
-        await onFinish(form.getFieldsValue());
         const success = await registerMembership();
         if (success) {
           // Proceed with creating listing as a member
@@ -284,6 +283,7 @@ const PostProperty = () => {
         userData.isMember = true;
         userData.wallet -= 20000;
         localStorage.setItem("user", JSON.stringify(userData));
+        await updateUserWallet(20000);
         return true;
       } else {
         throw new Error(
