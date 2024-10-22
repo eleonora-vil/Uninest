@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import api from "../../config/axios";
 import {
+  Layout,
   Row,
   Col,
   Card,
@@ -13,23 +12,27 @@ import {
   Avatar,
   Descriptions,
   Space,
-  Layout,
 } from "antd";
 import {
   PhoneOutlined,
   StarOutlined,
   MessageOutlined,
 } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
-import { FitScreen } from "@mui/icons-material";
-import { Box } from "@mui/joy";
 
 const { Title, Text } = Typography;
 const { Content } = Layout;
 
 const ImageGallery = ({ images }) => {
   const [mainImage, setMainImage] = useState(images[0]?.image?.imageUrl);
+
+  useEffect(() => {
+    if (images && images.length > 0) {
+      setMainImage(images[0]?.image?.imageUrl);
+    }
+  }, [images]);
 
   return (
     <Row gutter={[16, 16]}>
@@ -42,6 +45,7 @@ const ImageGallery = ({ images }) => {
             height: "75vh",
             maxHeight: "100vh",
             maxWidth: "100vw",
+            objectFit: "cover",
           }}
         />
       </Col>
@@ -72,31 +76,17 @@ const ImageGallery = ({ images }) => {
   );
 };
 
-const PropertyPage = () => {
-  const { id } = useParams();
-  const [propertyDetails, setPropertyDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+// useEffect(() => {
+//   return () => {
+//     propertyDetails.homeImages.forEach((image) => {
+//       if (image.image.imageUrl.startsWith("blob:")) {
+//         URL.revokeObjectURL(image.image.imageUrl);
+//       }
+//     });
+//   };
+// }, [propertyDetails.homeImages]);
 
-  useEffect(() => {
-    const fetchPropertyDetails = async () => {
-      try {
-        const response = await api.get(`api/Home/GetHomeByID?id=${id}`);
-        setPropertyDetails(response.data);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
-    fetchPropertyDetails();
-  }, [id]);
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!propertyDetails) return <div>No property details found</div>;
-
+const PropertyPreview = ({ propertyDetails }) => {
   return (
     <Layout style={{ minHeight: "100vh" }}>
       <AppHeader />
@@ -105,24 +95,13 @@ const PropertyPage = () => {
         <Row>
           <Col span={20}>
             <Text>
-              <Link
-                underline="none"
-                to={`/`}
-                style={{
-                  textDecoration: "none",
-                  color: "#F9A825",
-                }}
-              >
+              <Link to="/" style={{ textDecoration: "none", color: "#F9A825" }}>
                 Trang chủ
               </Link>{" "}
               &gt;{" "}
               <Link
-                underline="none"
-                to={`/listing`}
-                style={{
-                  textDecoration: "none",
-                  color: "#F9A825",
-                }}
+                to="/listing"
+                style={{ textDecoration: "none", color: "#F9A825" }}
               >
                 Nhà Thuê
               </Link>{" "}
@@ -212,9 +191,6 @@ const PropertyPage = () => {
                 <Descriptions.Item label="Phòng ngủ">
                   {propertyDetails.bedrooms} phòng
                 </Descriptions.Item>
-                {/* <Descriptions.Item label="Name" style={{ width: "20%" }}>
-                  {propertyDetails.name}
-                </Descriptions.Item> */}
               </Descriptions>
 
               <Divider>Mô tả</Divider>
@@ -228,7 +204,6 @@ const PropertyPage = () => {
               title="Vị trí"
               extra={<Button href="#map">Vị trí trên Google Maps</Button>}
             >
-              {/* Insert Google Maps API or Image Here */}
               <Image
                 width="100%"
                 src="/path/to/map-image.jpg"
@@ -256,4 +231,4 @@ const PropertyPage = () => {
   );
 };
 
-export default PropertyPage;
+export default PropertyPreview;

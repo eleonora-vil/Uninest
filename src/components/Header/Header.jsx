@@ -194,17 +194,18 @@ const AppHeader = () => {
           </Button>
         </Space>
       )}
-
-      <Button
-        icon={<UploadOutlined />}
-        type="primary"
-        style={{ marginLeft: "16px" }}
-        danger
-        size="large"
-        onClick={() => navigate("/posting")}
-      >
-        Đăng tin
-      </Button>
+      {isLoggedIn && (
+        <Button
+          icon={<UploadOutlined />}
+          type="primary"
+          style={{ marginLeft: "16px" }}
+          danger
+          size="large"
+          onClick={() => navigate("/posting")}
+        >
+          Đăng tin
+        </Button>
+      )}
     </Header>
   );
 };

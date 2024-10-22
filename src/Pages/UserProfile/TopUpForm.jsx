@@ -5,7 +5,7 @@ import { Button, Modal, Typography, Space, InputNumber, message } from "antd";
 
 const { Title } = Typography;
 
-const TopUpForm = ({ visible, onSuccess, onClose }) => {
+const TopUpForm = ({ visible, onSuccess, onClose, onReturnToMembership }) => {
   const [amount, setAmount] = useState("");
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -117,10 +117,11 @@ const TopUpForm = ({ visible, onSuccess, onClose }) => {
     }
   }, [payOSConfig, open]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     resetForm();
-    onClose();
-  };
+    onClose(); // This will close the modal and return to the previous view
+    onReturnToMembership(); // This will trigger the return to the membership modal
+  }, [resetForm, onClose, onReturnToMembership]);
 
   return (
     <Modal

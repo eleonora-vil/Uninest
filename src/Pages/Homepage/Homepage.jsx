@@ -97,15 +97,19 @@ export default function HomePage() {
         <Card
           sx={{
             minWidth: 200,
+            maxWidth: 300, // Set a max width for consistency
             marginRight: 2,
             borderRadius: 5,
-            height: "wrap-content",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
           }}
         >
           {item.homeImages && item.homeImages.length > 0 ? (
             <CardMedia
               component="img"
               height="200"
+              minHeight="200"
               image={item.homeImages[0].image?.imageUrl}
               alt={item.name}
             />
@@ -127,22 +131,9 @@ export default function HomePage() {
             <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
               <AttachMoneyIcon sx={{ color: "red", fontSize: 20, mr: 1 }} />
               <Typography variant="body2" color="text.secondary">
-                {item.price}/Tháng
+                {item.price} VNĐ/Tháng
               </Typography>
             </Box>
-            {/* Removed postTime and postPlace as they're not in the API response */}
-            {/* <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-          <AccessTimeIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
-          <Typography variant="body2" color="text.secondary">
-            {item.postTime}
-          </Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-          <LocationOnIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
-          <Typography variant="body2" color="text.secondary">
-            {item.postPlace}
-          </Typography>
-        </Box> */}
           </CardContent>
         </Card>
       </Link>
