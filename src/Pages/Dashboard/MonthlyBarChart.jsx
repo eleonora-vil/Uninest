@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import ReactApexChart from "react-apexcharts";
-import { getTotalEarningsByDay } from "../../config/axios"; // Update the import path as needed
+import { getTotalEarningsByDay } from "../../config/axios";
 
-const barChartOptions = {
+const initialBarChartOptions = {
   chart: {
     type: "bar",
     height: 365,
@@ -41,11 +41,11 @@ const barChartOptions = {
 export default function MonthlyBarChart() {
   const theme = useTheme();
 
-  const { primary, secondary } = theme.palette.text;
+  const { secondary } = theme.palette.text;
   const info = theme.palette.info.light;
 
   const [series, setSeries] = useState([{ data: [0, 0, 0, 0, 0, 0, 0] }]);
-  const [options, setOptions] = useState(barChartOptions);
+  const [options, setOptions] = useState(initialBarChartOptions);
 
   useEffect(() => {
     const fetchEarningsByDay = async () => {
@@ -53,28 +53,34 @@ export default function MonthlyBarChart() {
         const response = await getTotalEarningsByDay();
         const earningsData = response.data;
 
-        // Sort the data to ensure it's in the correct order (Sunday to Saturday)
-        const sortedData = earningsData.sort((a, b) => {
-          const days = [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-          ];
-          return days.indexOf(a.day) - days.indexOf(b.day);
-        });
+        // Create a map for quick lookup
+        const earningsMap = new Map(
+          earningsData.map((item) => [item.dayOfWeek, item.amount])
+        );
 
-        const earnings = sortedData.map((item) => item.totalEarnings);
-        setSeries([{ data: earnings }]);
+        // Define the order of days
+        const orderedDays = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
 
-        setOptions((prevState) => ({
-          ...prevState,
+        // Create the ordered earnings array
+        const orderedEarnings = orderedDays.map(
+          (day) => earningsMap.get(day) || 0
+        );
+
+        setSeries([{ data: orderedEarnings }]);
+
+        setOptions((prevOptions) => ({
+          ...prevOptions,
           xaxis: {
-            ...prevState.xaxis,
-            categories: sortedData.map((item) => item.day.substring(0, 2)),
+            ...prevOptions.xaxis,
+            categories: orderedDays.map((day) => day.substring(0, 2)),
           },
         }));
       } catch (error) {
@@ -86,11 +92,11 @@ export default function MonthlyBarChart() {
   }, []);
 
   useEffect(() => {
-    setOptions((prevState) => ({
-      ...prevState,
+    setOptions((prevOptions) => ({
+      ...prevOptions,
       colors: [info],
       xaxis: {
-        ...prevState.xaxis,
+        ...prevOptions.xaxis,
         labels: {
           style: {
             colors: Array(7).fill(secondary),
@@ -98,7 +104,7 @@ export default function MonthlyBarChart() {
         },
       },
     }));
-  }, [primary, info, secondary]);
+  }, [info, secondary]);
 
   return (
     <Box id="chart" sx={{ bgcolor: "transparent" }}>

@@ -163,7 +163,7 @@ export default function AuthPage() {
             email: formData.get("email"),
           });
           setEmail(formData.get("email"));
-          toggleAuthMode("signIn");
+          toggleAuthMode("signin");
           break;
         }
 

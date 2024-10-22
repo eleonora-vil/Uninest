@@ -54,6 +54,9 @@ export const getTotalPostsCount = () => {
 export const getTotalEarnings = () => {
   return api.get("/api/Dashboard/total-earnings");
 };
+export const getTotalTransactions = () => {
+  return api.get("/api/Dashboard/transactionCount");
+};
 
 export const getTotalEarningsByDay = () => {
   return api.get("/api/Dashboard/total-earnings-by-day");
