@@ -1,22 +1,21 @@
 import { useState } from "react";
-
-// material-ui
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-
-// project import
 import MainCard from "../../components/MainCard";
 import IncomeAreaChart from "./IncomeAreaChart";
 import useUniqueVisitorTracker from "../../hooks/useVisitorTracking";
 
-// ==============================|| DEFAULT - UNIQUE VISITOR ||============================== //
-
 export default function UniqueVisitorCard() {
   const [slot, setSlot] = useState("week");
   const uniqueVisitors = useUniqueVisitorTracker();
+
+  const totalVisitors =
+    slot === "week"
+      ? uniqueVisitors.daily.reduce((sum, day) => sum + day.y, 0)
+      : uniqueVisitors.monthly;
 
   return (
     <>
@@ -51,7 +50,7 @@ export default function UniqueVisitorCard() {
         <Box sx={{ pt: 1, pr: 2 }}>
           <Typography variant="h6" color="textSecondary">
             {slot === "week" ? "Weekly" : "Monthly"} Unique Visitors:{" "}
-            {slot === "week" ? uniqueVisitors.weekly : uniqueVisitors.monthly}
+            {totalVisitors}
           </Typography>
           <IncomeAreaChart slot={slot} uniqueVisitors={uniqueVisitors} />
         </Box>
