@@ -40,6 +40,15 @@ export default function DashboardDefault() {
     totalTransactions: 0,
   });
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   // Fetch Total Data
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -119,7 +128,7 @@ export default function DashboardDefault() {
             <Grid item xs={12} sm={6} md={4} lg={3}>
               <AnalyticEcommerce
                 title="Total Earnings"
-                count={`${dashboardData.totalEarnings.toFixed(2)} VNĐ`}
+                count={formatCurrency(dashboardData.totalEarnings)}
               />
             </Grid>
 
