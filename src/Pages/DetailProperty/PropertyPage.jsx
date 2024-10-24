@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import api from "../../config/axios";
+import PropertyMap from "./PropertyMap";
 import {
   Row,
   Col,
@@ -40,8 +41,8 @@ const ImageGallery = ({ images }) => {
           style={{
             width: "55vw",
             height: "75vh",
-            maxHeight: "100vh",
-            maxWidth: "100vw",
+            maxHeight: "90vh",
+            maxWidth: "90vw",
           }}
         />
       </Col>
@@ -226,16 +227,25 @@ const PropertyPage = () => {
           <Col xs={24} lg={10}>
             <Card
               title="Vị trí"
-              extra={<Button href="#map">Vị trí trên Google Maps</Button>}
+              extra={
+                <Button
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    `${propertyDetails.location.houseNumber} ${propertyDetails.location.street}, ${propertyDetails.location.town}, ${propertyDetails.location.district}, ${propertyDetails.location.province}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Xem trên Google Maps
+                </Button>
+              }
             >
-              {/* Insert Google Maps API or Image Here */}
-              <Image
-                width="100%"
-                src="/path/to/map-image.jpg"
-                alt="Property Map"
-              />
+              <PropertyMap location={propertyDetails.location} />
+              <Descriptions column={1} style={{ marginTop: "16px" }}>
+                <Descriptions.Item label="Địa chỉ">
+                  {`${propertyDetails.location.houseNumber} ${propertyDetails.location.street}, ${propertyDetails.location.town}, ${propertyDetails.location.district}, ${propertyDetails.location.province}`}
+                </Descriptions.Item>
+              </Descriptions>
             </Card>
-
             <Card title="Khu vực khác" style={{ marginTop: 20 }}>
               <List
                 size="small"
