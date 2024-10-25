@@ -15,16 +15,11 @@ import {
   Descriptions,
   Space,
   Layout,
+  Modal,
 } from "antd";
-import {
-  PhoneOutlined,
-  StarOutlined,
-  MessageOutlined,
-} from "@ant-design/icons";
+import { StarOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
-import { FitScreen } from "@mui/icons-material";
-import { Box } from "@mui/joy";
 
 const { Title, Text } = Typography;
 const { Content } = Layout;
@@ -78,6 +73,129 @@ const PropertyPage = () => {
   const [propertyDetails, setPropertyDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showContactInfo, setShowContactInfo] = useState(false);
+
+  // Get user data from localStorage
+  const userData = JSON.parse(localStorage.getItem("user"));
+  const isMember = userData?.isActiveMember;
+
+  // Handle book now click
+  const handleBookNowClick = () => {
+    if (!userData) {
+      Modal.warning({
+        title: "Login Required",
+        content: "Please login to view contact information.",
+      });
+      return;
+    }
+
+    if (!isMember) {
+      Modal.warning({
+        title: "Membership Required",
+        content:
+          "You need to be a member to view contact information. Please subscribe to continue.",
+      });
+      return;
+    }
+
+    setShowContactInfo(true);
+  };
+
+  // Modify the owner information card section
+  const OwnerInfoCard = () => (
+    <Card style={{ top: 0, zIndex: 1 }}>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Space direction="vertical" align="center" style={{ width: "100%" }}>
+            <Avatar size={64} src="/path/to/default/avatar.jpg" />
+            <Title level={5}>{propertyDetails.users.fullName}</Title>
+            <Text>
+              4.5 <StarOutlined /> (100 ratings)
+            </Text>
+
+            {showContactInfo && (
+              <>
+                <Text strong>Email: {propertyDetails.users.email}</Text>
+                <Text strong>Phone: {propertyDetails.users.phoneNumber}</Text>
+              </>
+            )}
+          </Space>
+        </Col>
+
+        <Col span={24}>
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <Button
+              icon={<InfoCircleOutlined />}
+              size="large"
+              style={{ width: "100%" }}
+              onClick={handleBookNowClick}
+            >
+              {showContactInfo
+                ? "Contact Information Shown"
+                : "View Contact Info"}
+            </Button>
+          </Space>
+        </Col>
+      </Row>
+    </Card>
+  );
+
+  const AddressSection = () => (
+    <Descriptions column={1} style={{ marginTop: "16px" }}>
+      <Descriptions.Item label="Địa chỉ">
+        {showContactInfo
+          ? `${propertyDetails.location.houseNumber} ${propertyDetails.location.street}, ${propertyDetails.location.town}, ${propertyDetails.location.district}, ${propertyDetails.location.province}`
+          : "Login and subscribe to view full address"}
+      </Descriptions.Item>
+    </Descriptions>
+  );
+
+  const MapSection = () => (
+    <Card
+      title="Vị trí"
+      extra={
+        showContactInfo ? (
+          <Button
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+              `${propertyDetails.location.houseNumber} ${propertyDetails.location.street}, ${propertyDetails.location.town}, ${propertyDetails.location.district}, ${propertyDetails.location.province}`
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Xem trên Google Maps
+          </Button>
+        ) : (
+          <Button onClick={handleBookNowClick} icon={<InfoCircleOutlined />}>
+            View Location
+          </Button>
+        )
+      }
+    >
+      {showContactInfo ? (
+        <PropertyMap location={propertyDetails.location} />
+      ) : (
+        <div
+          style={{
+            height: "300px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#f5f5f5",
+            border: "1px dashed #d9d9d9",
+            borderRadius: "2px",
+          }}
+        >
+          <Space direction="vertical" align="center">
+            <InfoCircleOutlined
+              style={{ fontSize: "24px", color: "#bfbfbf" }}
+            />
+            <Text type="secondary">Subscribe to view the exact location</Text>
+          </Space>
+        </div>
+      )}
+      <AddressSection />
+    </Card>
+  );
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -141,44 +259,7 @@ const PropertyPage = () => {
 
           {/* Owner Information */}
           <Col xs={24} lg={10}>
-            <Card style={{ top: 0, zIndex: 1 }}>
-              <Row gutter={[16, 16]}>
-                {/* Owner Details */}
-                <Col span={24}>
-                  <Space
-                    direction="vertical"
-                    align="center"
-                    style={{ width: "100%" }}
-                  >
-                    <Avatar size={64} src="/path/to/default/avatar.jpg" />
-                    <Title level={5}>{propertyDetails.ownerName}</Title>
-                    <Text>
-                      4.5 <StarOutlined /> (100 ratings)
-                    </Text>
-                  </Space>
-                </Col>
-
-                {/* Communication Options */}
-                <Col span={24}>
-                  <Space direction="vertical" style={{ width: "100%" }}>
-                    <Button
-                      icon={<PhoneOutlined />}
-                      size="large"
-                      style={{ width: "100%" }}
-                    >
-                      Call Now
-                    </Button>
-                    <Button
-                      icon={<MessageOutlined />}
-                      size="large"
-                      style={{ width: "100%" }}
-                    >
-                      Chat with Owner
-                    </Button>
-                  </Space>
-                </Col>
-              </Row>
-            </Card>
+            <OwnerInfoCard />
           </Col>
         </Row>
 
@@ -225,27 +306,7 @@ const PropertyPage = () => {
 
           {/* Map Section */}
           <Col xs={24} lg={10}>
-            <Card
-              title="Vị trí"
-              extra={
-                <Button
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    `${propertyDetails.location.houseNumber} ${propertyDetails.location.street}, ${propertyDetails.location.town}, ${propertyDetails.location.district}, ${propertyDetails.location.province}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Xem trên Google Maps
-                </Button>
-              }
-            >
-              <PropertyMap location={propertyDetails.location} />
-              <Descriptions column={1} style={{ marginTop: "16px" }}>
-                <Descriptions.Item label="Địa chỉ">
-                  {`${propertyDetails.location.houseNumber} ${propertyDetails.location.street}, ${propertyDetails.location.town}, ${propertyDetails.location.district}, ${propertyDetails.location.province}`}
-                </Descriptions.Item>
-              </Descriptions>
-            </Card>
+            <MapSection />
             <Card title="Khu vực khác" style={{ marginTop: 20 }}>
               <List
                 size="small"
