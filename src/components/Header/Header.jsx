@@ -328,7 +328,15 @@ const AppHeader = () => {
         <Dropdown overlay={userMenu} placement="bottomRight" size="large">
           <Space style={{ cursor: "pointer" }}>
             <Avatar src={avatarUrl} />
-            <span>{userData.fullName}</span>
+            <span
+              style={{
+                fontSize: "12px",
+                whiteSpace: "nowrap",
+                display: "inline-block",
+              }}
+            >
+              {userData.fullName}
+            </span>
             {userData.isActiveMember ? (
               <Badge
                 status="success"
