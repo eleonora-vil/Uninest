@@ -71,7 +71,7 @@ const PostProperty = () => {
       const storedData = localStorage.getItem("user");
       if (storedData) {
         const userData = JSON.parse(storedData);
-        return userData.isMember;
+        return userData.isActiveMember;
       }
       return null;
     } catch (error) {
@@ -287,7 +287,7 @@ const PostProperty = () => {
         message.success("Membership registration successful!");
         // Update local storage to reflect new membership status
         const userData = JSON.parse(localStorage.getItem("user"));
-        userData.isMember = true;
+        userData.isActiveMember = true;
         localStorage.setItem("user", JSON.stringify(userData));
         //await updateUserWallet(10000);
         await createListing();
