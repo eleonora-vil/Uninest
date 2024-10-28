@@ -166,9 +166,9 @@ const ProfileLayout = ({ userData, onUpdateSuccess }) => {
                 <Col span={12}>
                   <Form.Item label="Giới tính" name="gender">
                     <Select>
-                      <Option value="Male">Nam</Option>
-                      <Option value="Female">Nữ</Option>
-                      <Option value="Other">Khác</Option>
+                      <Option value="male">Nam</Option>
+                      <Option value="female">Nữ</Option>
+                      <Option value="other">Khác</Option>
                     </Select>
                   </Form.Item>
                 </Col>
