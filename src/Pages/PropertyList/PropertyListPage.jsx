@@ -407,9 +407,9 @@ const PropertyList = () => {
                                 <HomeOutlined />
                                 <Text>{item.size}</Text>
                                 <Text>•</Text>
-                                <Text>{item.bedrooms} PN</Text>
+                                <Text>{item.bedrooms} Phòng ngủ</Text>
                                 <Text>•</Text>
-                                <Text>{item.bathroom} VS</Text>
+                                <Text>{item.bathroom} Nhà vệ sinh </Text>
                               </Space>
 
                               {renderLocation(item.location)}
