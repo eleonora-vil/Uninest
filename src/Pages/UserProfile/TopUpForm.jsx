@@ -48,19 +48,30 @@ const TopUpForm = ({ visible, onSuccess, onClose, onReturnToMembership }) => {
     try {
       const response = await api.post(
         "/api/Payment/CheckOrderAndUpdateWallet",
-        orderCode
+        { orderCode: orderCode }, // Send as an object
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      if (
-        response.data.error === 0 &&
-        response.data.data.paymentInfo.Status === "PAID"
-      ) {
-        onSuccess("Nạp tiền thành công");
-        return true; // Indicate successful payment
+      if (response.data.error === 0) {
+        if (response.data.data.paymentInfo.status === "PAID") {
+          // Update the user's wallet balance in your application state
+          onSuccess(
+            `Nạp tiền thành công. Số dư mới: ${response.data.data.userInfo.wallet}`
+          );
+          return true; // Indicate successful payment
+        } else if (response.data.data.paymentInfo.status === "CANCELLED") {
+          message.error("Giao dịch đã bị hủy");
+          return true; // Stop checking as the order is cancelled
+        }
       }
       return false; // Payment not completed yet
     } catch (error) {
       console.error("Error checking order status:", error);
+      message.error("Lỗi khi kiểm tra trạng thái giao dịch");
       return false;
     }
   };

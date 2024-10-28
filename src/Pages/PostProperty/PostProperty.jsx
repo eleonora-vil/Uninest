@@ -288,9 +288,8 @@ const PostProperty = () => {
         // Update local storage to reflect new membership status
         const userData = JSON.parse(localStorage.getItem("user"));
         userData.isMember = true;
-        userData.wallet -= 20000;
         localStorage.setItem("user", JSON.stringify(userData));
-        await updateUserWallet(20000);
+        //await updateUserWallet(10000);
         await createListing();
         return true;
       } else {
@@ -299,7 +298,7 @@ const PostProperty = () => {
         );
       }
     } catch (error) {
-      console.error("Error registering membership:", error);
+      console.error("Error registering membership:", error.message);
       message.error("Failed to register membership: " + error.message);
       return false;
     }
