@@ -16,8 +16,13 @@ import {
   Space,
   Layout,
   Modal,
+  Breadcrumb,
 } from "antd";
-import { StarOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import {
+  StarOutlined,
+  InfoCircleOutlined,
+  HomeOutlined,
+} from "@ant-design/icons";
 import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
 
@@ -28,43 +33,55 @@ const ImageGallery = ({ images }) => {
   const [mainImage, setMainImage] = useState(images[0]?.image?.imageUrl);
 
   return (
-    <Row gutter={[16, 16]}>
-      <Col span={24}>
-        <Image
-          src={mainImage}
-          alt="Main Property Image"
-          style={{
-            width: "55vw",
-            height: "75vh",
-            maxHeight: "90vh",
-            maxWidth: "90vw",
-          }}
-        />
-      </Col>
-      <Col span={24}>
-        <Row
-          gutter={[8, 8]}
-          style={{ overflowX: "auto", whiteSpace: "nowrap" }}
-        >
-          {images.map((image, index) => (
-            <Col key={index} style={{ display: "inline-block" }}>
-              <Image
-                src={image.image.imageUrl}
-                alt={`Property Image ${index + 1}`}
-                style={{
-                  width: "120px",
-                  height: "120px",
-                  objectFit: "cover",
-                  cursor: "pointer",
-                }}
-                onClick={() => setMainImage(image.image.imageUrl)}
-                preview={false}
-              />
-            </Col>
-          ))}
-        </Row>
-      </Col>
-    </Row>
+    <Card bordered={false} className="gallery-card">
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Image
+            src={mainImage}
+            alt="Main Property Image"
+            style={{
+              width: "100%",
+              height: "600px",
+              objectFit: "cover",
+              borderRadius: "8px",
+            }}
+          />
+        </Col>
+        <Col span={24}>
+          <Row
+            gutter={[12, 12]}
+            style={{
+              overflowX: "auto",
+              whiteSpace: "nowrap",
+              padding: "4px 0",
+            }}
+          >
+            {images.map((image, index) => (
+              <Col key={index} style={{ display: "inline-block" }}>
+                <Image
+                  src={image.image.imageUrl}
+                  alt={`Property Image ${index + 1}`}
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "cover",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                    transition: "all 0.3s",
+                    border:
+                      mainImage === image.image.imageUrl
+                        ? "2px solid #1890ff"
+                        : "2px solid transparent",
+                  }}
+                  onClick={() => setMainImage(image.image.imageUrl)}
+                  preview={false}
+                />
+              </Col>
+            ))}
+          </Row>
+        </Col>
+      </Row>
+    </Card>
   );
 };
 
@@ -103,38 +120,55 @@ const PropertyPage = () => {
 
   // Modify the owner information card section
   const OwnerInfoCard = () => (
-    <Card style={{ top: 0, zIndex: 1 }}>
-      <Row gutter={[16, 16]}>
+    <Card
+      className="owner-card"
+      style={{
+        borderRadius: "8px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+      }}
+    >
+      <Row gutter={[16, 24]}>
         <Col span={24}>
           <Space direction="vertical" align="center" style={{ width: "100%" }}>
-            <Avatar size={64} src="/path/to/default/avatar.jpg" />
-            <Title level={5}>{propertyDetails.users.fullName}</Title>
-            <Text>
-              4.5 <StarOutlined /> (100 ratings)
-            </Text>
+            <Avatar
+              size={80}
+              src="/path/to/default/avatar.jpg"
+              style={{ border: "2px solid #f0f0f0" }}
+            />
+            <Title level={4} style={{ margin: "12px 0 4px" }}>
+              {propertyDetails.users.fullName}
+            </Title>
+            <Space>
+              <StarOutlined style={{ color: "#faad14" }} />
+              <Text strong>4.5</Text>
+              <Text type="secondary">(100 ratings)</Text>
+            </Space>
 
             {showContactInfo && (
-              <>
+              <Space direction="vertical" style={{ marginTop: "16px" }}>
                 <Text strong>Email: {propertyDetails.users.email}</Text>
                 <Text strong>Phone: {propertyDetails.users.phoneNumber}</Text>
-              </>
+              </Space>
             )}
           </Space>
         </Col>
 
         <Col span={24}>
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <Button
-              icon={<InfoCircleOutlined />}
-              size="large"
-              style={{ width: "100%" }}
-              onClick={handleBookNowClick}
-            >
-              {showContactInfo
-                ? "Contact Information Shown"
-                : "View Contact Info"}
-            </Button>
-          </Space>
+          <Button
+            type="primary"
+            icon={<InfoCircleOutlined />}
+            size="large"
+            style={{
+              width: "100%",
+              height: "48px",
+              borderRadius: "6px",
+            }}
+            onClick={handleBookNowClick}
+          >
+            {showContactInfo
+              ? "Contact Information Shown"
+              : "View Contact Info"}
+          </Button>
         </Col>
       </Row>
     </Card>
@@ -217,106 +251,170 @@ const PropertyPage = () => {
   if (!propertyDetails) return <div>No property details found</div>;
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ minHeight: "100vh", background: "#f5f5f5" }}>
       <AppHeader />
-      <Content style={{ padding: "20px", overflow: "auto" }}>
+      <Content
+        style={{ padding: "20px 48px", maxWidth: "1800px", margin: "0 auto" }}
+      >
         {/* Breadcrumb */}
-        <Row>
-          <Col span={20}>
-            <Text>
-              <Link
-                underline="none"
-                to={`/`}
-                style={{
-                  textDecoration: "none",
-                  color: "#F9A825",
-                }}
-              >
-                Trang chủ
-              </Link>{" "}
-              &gt;{" "}
-              <Link
-                underline="none"
-                to={`/listing`}
-                style={{
-                  textDecoration: "none",
-                  color: "#F9A825",
-                }}
-              >
-                Nhà Thuê
-              </Link>{" "}
-              &gt; {propertyDetails.name}
-            </Text>
-          </Col>
-        </Row>
+        <Breadcrumb style={{ marginBottom: "24px" }}>
+          <Breadcrumb.Item>
+            <Link to="/">
+              <HomeOutlined /> Home
+            </Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <Link to="/listing">Properties</Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>{propertyDetails?.name}</Breadcrumb.Item>
+        </Breadcrumb>
 
-        {/* Main Property Section */}
-        <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
-          {/* Image Gallery */}
-          <Col xs={24} lg={14}>
-            <ImageGallery images={propertyDetails.homeImages} />
-          </Col>
+        {/* Property Title */}
+        <Title level={2} style={{ marginBottom: "24px" }}>
+          {propertyDetails?.name}
+        </Title>
 
-          {/* Owner Information */}
-          <Col xs={24} lg={10}>
-            <OwnerInfoCard />
-          </Col>
-        </Row>
+        {/* Main Content */}
+        <Row gutter={[32, 32]}>
+          <Col xs={26} xl={16} xxl={14}>
+            <ImageGallery
+              images={propertyDetails?.homeImages}
+              style={{
+                width: "100%",
+                ".ant-image": {
+                  width: "100%",
+                  height: "600px", // Increased height
+                },
+              }}
+            />
 
-        {/* Property Details Section */}
-        <Row gutter={[16, 16]} style={{ marginTop: 20, width: "100%" }}>
-          <Col xs={24} lg={14}>
+            {/* Property Details Card */}
             <Card
               style={{
-                height: "100%",
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
+                marginTop: "24px",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               }}
             >
+              <Title level={4}>Property Details</Title>
               <Descriptions
-                title="Chi tiết cho thuê"
                 bordered
-                style={{ width: "100%" }}
+                column={{ xs: 1, sm: 2, md: 3, lg: 4 }} // More responsive columns
               >
                 <Descriptions.Item label="ID">
-                  {propertyDetails.homeId}
+                  {propertyDetails?.homeId}
                 </Descriptions.Item>
-                <Descriptions.Item label="Diện tích">
-                  {propertyDetails.size} 300 sqm
+                <Descriptions.Item label="Size">
+                  {propertyDetails?.size} sqm
                 </Descriptions.Item>
-                <Descriptions.Item label="Phòng tắm">
-                  {propertyDetails.bathroom} phòng
+                <Descriptions.Item label="Bathrooms">
+                  {propertyDetails?.bathroom}
                 </Descriptions.Item>
-                <Descriptions.Item label="Giá cả">
-                  ${propertyDetails.price}/Tháng
+                <Descriptions.Item label="Price">
+                  ${propertyDetails?.price}/Month
                 </Descriptions.Item>
-                <Descriptions.Item label="Phòng ngủ">
-                  {propertyDetails.bedrooms} phòng
+                <Descriptions.Item label="Bedrooms">
+                  {propertyDetails?.bedrooms}
                 </Descriptions.Item>
-                {/* <Descriptions.Item label="Name" style={{ width: "20%" }}>
-                  {propertyDetails.name}
-                </Descriptions.Item> */}
               </Descriptions>
 
-              <Divider>Mô tả</Divider>
-              <Text>{propertyDetails.description}</Text>
+              <Divider />
+
+              <Title level={4}>Description</Title>
+              <Text>{propertyDetails?.description}</Text>
             </Card>
           </Col>
 
-          {/* Map Section */}
-          <Col xs={24} lg={10}>
-            <MapSection />
-            <Card title="Khu vực khác" style={{ marginTop: 20 }}>
+          <Col xs={24} xl={8} xxl={10}>
+            <OwnerInfoCard />
+
+            {/* Map Section */}
+            <Card
+              title={<Title level={4}>Location</Title>}
+              style={{
+                marginTop: "24px",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              }}
+            >
+              {showContactInfo ? (
+                <>
+                  <PropertyMap location={propertyDetails?.location} />
+                  <Button
+                    type="link"
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      `${propertyDetails.location.houseNumber} ${propertyDetails.location.street}, ${propertyDetails.location.town}, ${propertyDetails.location.district}, ${propertyDetails.location.province}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ marginTop: "16px" }}
+                  >
+                    View on Google Maps
+                  </Button>
+                </>
+              ) : (
+                <div
+                  style={{
+                    height: "300px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "#fafafa",
+                    borderRadius: "8px",
+                    border: "1px dashed #d9d9d9",
+                  }}
+                >
+                  <Space direction="vertical" align="center">
+                    <InfoCircleOutlined
+                      style={{ fontSize: "32px", color: "#bfbfbf" }}
+                    />
+                    <Text type="secondary">
+                      Subscribe to view the exact location
+                    </Text>
+                    <Button type="primary" onClick={handleBookNowClick}>
+                      View Location
+                    </Button>
+                  </Space>
+                </div>
+              )}
+
+              {/* Address Section */}
+              <Descriptions column={1} style={{ marginTop: "24px" }} bordered>
+                <Descriptions.Item label={<Text strong>Address</Text>}>
+                  {showContactInfo
+                    ? `${propertyDetails.location.houseNumber} ${propertyDetails.location.street}, ${propertyDetails.location.town}, ${propertyDetails.location.district}, ${propertyDetails.location.province}`
+                    : "Login and subscribe to view full address"}
+                </Descriptions.Item>
+              </Descriptions>
+            </Card>
+
+            {/* Similar Properties */}
+            <Card
+              title={<Title level={4}>Similar Properties</Title>}
+              style={{
+                marginTop: "24px",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              }}
+            >
               <List
-                size="small"
+                itemLayout="horizontal"
                 dataSource={[
                   "District 1",
                   "District 2",
                   "District 7",
                   "Go Vap",
                 ]}
-                renderItem={(item) => <List.Item>{item}</List.Item>}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<Avatar src="https://via.placeholder.com/40" />}
+                      title={<Text strong>{item}</Text>}
+                      description="Available properties in this area"
+                    />
+                    <Button type="link">View</Button>
+                  </List.Item>
+                )}
               />
             </Card>
           </Col>
