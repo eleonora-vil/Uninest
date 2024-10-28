@@ -134,11 +134,15 @@ const TopUpForm = ({ visible, onSuccess, onClose, initialAmount = 0 }) => {
     }
   }, [payOSConfig, open]);
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     resetForm();
-    onClose(); // This will close the modal and return to the previous view
-    onReturnToMembership(); // This will trigger the return to the membership modal
-  }, [resetForm, onClose, onReturnToMembership]);
+    onClose();
+  };
+  // const handleCancel = useCallback(() => {
+  //   resetForm();
+  //   onClose(); // This will close the modal and return to the previous view
+  //   onReturnToMembership(); // This will trigger the return to the membership modal
+  // }, [resetForm, onClose, onReturnToMembership]);
 
   return (
     <Modal
