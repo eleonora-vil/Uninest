@@ -24,8 +24,11 @@ export default function HomePage() {
   const [loading, setLoading] = React.useState(true); // Handle loading state
   const [error, setError] = React.useState(null); // Handle errors
 
-  const handleHomeClick = () => {
+  const handleHomeListingClick = () => {
     navigate("/listing");
+  };
+  const handleServiceListingClick = () => {
+    navigate("/services");
   };
 
   React.useEffect(() => {
@@ -346,7 +349,7 @@ export default function HomePage() {
                   startDecorator={<RentingLogoButton />}
                   size="lg"
                   color="neutral"
-                  onClick={handleHomeClick}
+                  onClick={handleHomeListingClick}
                 >
                   Cho thuê
                 </Button>
@@ -381,7 +384,7 @@ export default function HomePage() {
                     startDecorator={<CleaningLogoButton />}
                     size="lg"
                     color="neutral"
-                    onClick={handleHomeClick}
+                    onClick={handleServiceListingClick}
                   >
                     Dọn nhà
                   </Button>
@@ -390,7 +393,7 @@ export default function HomePage() {
                     startDecorator={<MovingLogoButton />}
                     size="lg"
                     color="neutral"
-                    onClick={handleHomeClick}
+                    onClick={handleServiceListingClick}
                   >
                     Chuyển nhà
                   </Button>
