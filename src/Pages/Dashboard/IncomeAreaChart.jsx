@@ -37,27 +37,12 @@ export default function IncomeAreaChart({ slot, uniqueVisitors }) {
       ...prevState,
       colors: [theme.palette.primary.main],
       xaxis: {
-        categories:
-          slot === "month"
-            ? [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-              ]
-            : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        type: "datetime",
         labels: {
           style: {
             colors: Array(12).fill(secondary),
           },
+          format: "dd MMM",
         },
         axisBorder: {
           show: true,
@@ -77,30 +62,38 @@ export default function IncomeAreaChart({ slot, uniqueVisitors }) {
       },
       tooltip: {
         theme: "light",
+        x: {
+          format: "dd MMM yyyy",
+        },
       },
     }));
   }, [secondary, line, theme, slot]);
 
   useEffect(() => {
-    const uniqueVisitorData =
-      slot === "month"
-        ? Array.from({ length: 12 }, () =>
-            Math.floor(
-              (uniqueVisitors.monthly / 12) * (0.8 + Math.random() * 0.4)
-            )
-          )
-        : Array.from({ length: 7 }, () =>
-            Math.floor(
-              (uniqueVisitors.weekly / 7) * (0.8 + Math.random() * 0.4)
-            )
-          );
-
-    setSeries([
-      {
-        name: "Unique Visitors",
-        data: uniqueVisitorData,
-      },
-    ]);
+    if (slot === "week") {
+      setSeries([
+        {
+          name: "Unique Visitors",
+          data: uniqueVisitors.daily,
+        },
+      ]);
+    } else {
+      // For monthly view, we'll simulate data as we don't have actual monthly breakdown
+      const monthlyData = Array.from({ length: 30 }, (_, index) => {
+        const date = new Date();
+        date.setDate(date.getDate() - 29 + index);
+        return {
+          x: date.toISOString().split("T")[0],
+          y: Math.floor(Math.random() * uniqueVisitors.monthly),
+        };
+      });
+      setSeries([
+        {
+          name: "Unique Visitors",
+          data: monthlyData,
+        },
+      ]);
+    }
   }, [slot, uniqueVisitors]);
 
   return (
@@ -116,7 +109,12 @@ export default function IncomeAreaChart({ slot, uniqueVisitors }) {
 IncomeAreaChart.propTypes = {
   slot: PropTypes.string,
   uniqueVisitors: PropTypes.shape({
-    daily: PropTypes.number,
+    daily: PropTypes.arrayOf(
+      PropTypes.shape({
+        x: PropTypes.string,
+        y: PropTypes.number,
+      })
+    ),
     weekly: PropTypes.number,
     monthly: PropTypes.number,
   }),

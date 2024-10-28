@@ -23,6 +23,7 @@ import {
   getTotalUsersCount,
   getTotalPostsCount,
   getTotalEarnings,
+  getTotalTransactions,
 } from "../../config/axios";
 import NewUserList from "./NewUser";
 // assets
@@ -36,23 +37,39 @@ export default function DashboardDefault() {
     totalUsers: 0,
     totalPosts: 0,
     totalEarnings: 0,
+    totalTransactions: 0,
   });
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
   // Fetch Total Data
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [usersResponse, postsResponse, earningsResponse] =
-          await Promise.all([
-            getTotalUsersCount(),
-            getTotalPostsCount(),
-            getTotalEarnings(),
-          ]);
+        const [
+          usersResponse,
+          postsResponse,
+          earningsResponse,
+          transationsResponse,
+        ] = await Promise.all([
+          getTotalUsersCount(),
+          getTotalPostsCount(),
+          getTotalEarnings(),
+          getTotalTransactions(),
+        ]);
 
         setDashboardData({
           totalUsers: usersResponse.data.totalUsers,
           totalPosts: postsResponse.data.totalPosts,
           totalEarnings: earningsResponse.data.totalEarnings,
+          totalTransactions: transationsResponse.data.totalTransactions,
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -103,12 +120,15 @@ export default function DashboardDefault() {
               />
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={3}>
-              <AnalyticEcommerce title="Total Subscription" count="18,800" />
+              <AnalyticEcommerce
+                title="Total Transcations"
+                count={dashboardData.totalTransactions.toString()}
+              />
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={3}>
               <AnalyticEcommerce
                 title="Total Earnings"
-                count={`${dashboardData.totalEarnings.toFixed(2)} VNĐ`}
+                count={formatCurrency(dashboardData.totalEarnings)}
               />
             </Grid>
 

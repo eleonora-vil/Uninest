@@ -26,8 +26,8 @@ const UserProfile = () => {
   const [userData, setUserData] = useState(null);
   const [form] = Form.useForm();
   const [passwordForm] = Form.useForm();
-  const [isPhoneVisible, setIsPhoneVisible] = useState(false);
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  // const [isPhoneVisible, setIsPhoneVisible] = useState(false);
+  // const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const navigate = useNavigate(); // Use useNavigate hook
 
   useEffect(() => {
@@ -42,8 +42,6 @@ const UserProfile = () => {
       if (response.data && response.data.success && response.data.result) {
         const userData = response.data.result;
         setUserData(userData);
-        // Since isPhoneVisible is not in the response, we'll remove this line
-        // setIsPhoneVisible(userData.isPhoneVisible || false);
         form.setFieldsValue({
           ...userData,
           birthDate: userData.birthDate ? moment(userData.birthDate) : null,
@@ -112,36 +110,6 @@ const UserProfile = () => {
           (error.response?.data?.message || error.message)
       );
     }
-  };
-
-  const handlePhoneVisibilityChange = async (checked) => {
-    try {
-      const response = await userService.updatePhoneVisibility(checked);
-      if (response.data.success) {
-        setIsPhoneVisible(checked);
-        message.success("Phone visibility updated successfully");
-      }
-    } catch (error) {
-      message.error("Failed to update phone visibility");
-    }
-  };
-
-  const showDeleteModal = () => {
-    setIsDeleteModalVisible(true);
-  };
-
-  const handleDeleteAccount = async () => {
-    try {
-      const response = await userService.deleteAccount();
-      if (response.data.success) {
-        message.success("Account deleted successfully");
-        // Redirect to home page or login page
-        navigate("/");
-      }
-    } catch (error) {
-      message.error("Failed to delete account");
-    }
-    setIsDeleteModalVisible(false);
   };
 
   const renderContent = () => {
@@ -223,46 +191,6 @@ const UserProfile = () => {
                 </Button>
               </Form.Item>
             </Form>
-            <div
-              style={{
-                marginTop: "24px",
-                padding: "16px",
-                background: "#f7f5f3",
-              }}
-            >
-              <h3>Cho phép liên lạc qua điện thoại</h3>
-              <p>
-                Khi bật tính năng này, số điện thoại sẽ hiển thị trên tất cả
-                thông tin đăng của bạn.
-              </p>
-              <Switch
-                checked={isPhoneVisible}
-                onChange={handlePhoneVisibilityChange}
-              />
-            </div>
-            <Button
-              danger
-              style={{
-                marginTop: "16px",
-                display: "block",
-              }}
-              onClick={showDeleteModal}
-            >
-              Yêu cầu chấm dứt tài khoản
-            </Button>
-            <Modal
-              title="Xác nhận xóa tài khoản"
-              visible={isDeleteModalVisible}
-              onOk={handleDeleteAccount}
-              onCancel={() => setIsDeleteModalVisible(false)}
-              okText="Xóa tài khoản"
-              cancelText="Hủy"
-            >
-              <p>
-                Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể
-                hoàn tác.
-              </p>
-            </Modal>
           </div>
         );
       default:

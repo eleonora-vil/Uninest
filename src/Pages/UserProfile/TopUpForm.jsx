@@ -1,14 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePayOS } from "payos-checkout";
 import api from "../../config/axios";
-import { Button, Modal, Typography, Space, InputNumber, message } from "antd";
+import { Button, Modal, Space, InputNumber, message } from "antd";
 
-const { Title } = Typography;
-
-const TopUpForm = ({ visible, onSuccess, onClose, onReturnToMembership }) => {
-  const [amount, setAmount] = useState("");
+const TopUpForm = ({ visible, onSuccess, onClose, initialAmount = 0 }) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [amount, setAmount] = useState(initialAmount.toString());
   const [payOSConfig, setPayOSConfig] = useState({
     RETURN_URL: window.location.origin,
     ELEMENT_ID: "embedded-payment-container",
@@ -18,6 +16,11 @@ const TopUpForm = ({ visible, onSuccess, onClose, onReturnToMembership }) => {
       onSuccess("Nạp tiền thành công");
     },
   });
+
+  // pass money needed for use something
+  useEffect(() => {
+    setAmount(initialAmount.toString());
+  }, [initialAmount]);
 
   const { open, exit } = usePayOS(payOSConfig);
 
@@ -96,12 +99,15 @@ const TopUpForm = ({ visible, onSuccess, onClose, onReturnToMembership }) => {
         }));
 
         const orderCode = response.data.data.paymentInfo.orderCode;
+        console.log(orderCode);
 
         // Start checking order status
         const checkInterval = setInterval(async () => {
-          const isPaid = await checkOrderStatus(orderCode);
-          if (isPaid) {
+          const isCompleted = await checkOrderStatus(orderCode);
+          if (isCompleted) {
             clearInterval(checkInterval);
+            resetForm();
+            onClose();
           }
         }, 5000);
 

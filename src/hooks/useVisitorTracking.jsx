@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const useUniqueVisitorTracker = () => {
   const [uniqueVisitors, setUniqueVisitors] = useState({
-    daily: 0,
+    daily: [],
     weekly: 0,
     monthly: 0,
   });
@@ -23,27 +23,43 @@ const useUniqueVisitorTracker = () => {
 
       let visitorData = JSON.parse(localStorage.getItem("visitorData")) || {};
 
+      let updatedDaily = [];
+      let updatedWeekly = 0;
+      let updatedMonthly = 0;
+
+      // Process last 7 days
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        const dateString = date.toISOString().split("T")[0];
+        const isVisited = visitorData[dateString] ? 1 : 0;
+        updatedDaily.unshift({ x: dateString, y: isVisited });
+      }
+
       if (!visitorData[today]) {
         visitorData[today] = true;
-        setUniqueVisitors((prev) => ({ ...prev, daily: prev.daily + 1 }));
+        updatedDaily[updatedDaily.length - 1].y = 1;
       }
 
       if (!visitorData[`week_${thisWeek}`]) {
         visitorData[`week_${thisWeek}`] = true;
-        setUniqueVisitors((prev) => ({ ...prev, weekly: prev.weekly + 1 }));
+        updatedWeekly = 1;
       }
 
       if (!visitorData[`month_${thisMonth}`]) {
         visitorData[`month_${thisMonth}`] = true;
-        setUniqueVisitors((prev) => ({ ...prev, monthly: prev.monthly + 1 }));
+        updatedMonthly = 1;
       }
 
       localStorage.setItem("visitorData", JSON.stringify(visitorData));
+
+      setUniqueVisitors({
+        daily: updatedDaily,
+        weekly: updatedWeekly,
+        monthly: updatedMonthly,
+      });
     };
 
-    trackVisitor();
-
-    // Clean up old data
     const cleanUpOldData = () => {
       const visitorData = JSON.parse(localStorage.getItem("visitorData")) || {};
       const now = new Date();
@@ -54,7 +70,7 @@ const useUniqueVisitorTracker = () => {
       );
 
       Object.keys(visitorData).forEach((key) => {
-        if (new Date(key) < oneMonthAgo) {
+        if (key.startsWith("20") && new Date(key) < oneMonthAgo) {
           delete visitorData[key];
         }
       });
@@ -62,13 +78,14 @@ const useUniqueVisitorTracker = () => {
       localStorage.setItem("visitorData", JSON.stringify(visitorData));
     };
 
+    trackVisitor();
     cleanUpOldData();
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once per page load
 
   return uniqueVisitors;
 };
 
-// Helper function to get the week number
+// Helper function to get the week number (unchanged)
 const getWeekNumber = (date) => {
   const d = new Date(
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
