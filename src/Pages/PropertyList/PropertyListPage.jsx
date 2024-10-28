@@ -1,85 +1,254 @@
-// App.js
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   List,
   Card,
   Button,
   Space,
-  Dropdown,
   Menu,
-  Radio,
   Row,
   Col,
   Collapse,
   Layout,
   Typography,
+  Tag,
+  message,
+  Empty,
 } from "antd";
 import {
   FilterOutlined,
-  DownOutlined,
-  LaptopOutlined,
-  RocketOutlined,
-  HeartOutlined,
+  HomeOutlined,
+  EnvironmentOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
 } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import "antd/dist/reset.css";
 import "./App.css";
 import AppHeader from "../../components/Header/Header";
 import FooterComponent from "../../components/Footer/Footer";
+import api from "../../config/axios";
 
 const { Panel } = Collapse;
 const { Content } = Layout;
-
-const properties = [
-  {
-    title: "Phòng trọ Thanh Lộc mới 30m2",
-    price: "3,30 triệu/tháng",
-    area: "30 m²",
-    status: "Cá Nhân",
-    location: "758 Hà Huy Giáp",
-    image: "https://via.placeholder.com/150",
-  },
-  {
-    title: "NHÀ TRỌ MỚI XÂY",
-    price: "2,90 triệu/tháng",
-    area: "30 m²",
-    status: "Môi giới",
-    location: "đường TX40",
-    image: "https://via.placeholder.com/150",
-  },
-  // Add more properties as needed
-];
+const { Text } = Typography;
 
 const PropertyList = () => {
-  const [filteredProperties, setFilteredProperties] = useState(properties);
-  const [category, setCategory] = useState("Tất cả");
-  const [sortLabel, setSortLabel] = useState("Giá thấp trước");
+  const [properties, setProperties] = useState([]);
+  const [filteredProperties, setFilteredProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [priceRange, setPriceRange] = useState(null);
+  const [sizeRange, setSizeRange] = useState(null);
+  const [selectedUtilities, setSelectedUtilities] = useState([]);
+  const [statusFilter, setStatusFilter] = useState(null);
+  const [areaFilter, setAreaFilter] = useState(null);
+  const [priceSort, setPriceSort] = useState(null); // null, 'asc', or 'desc'
+  const [sizeSort, setSizeSort] = useState(null); // null, 'asc', or 'desc'
 
-  const menu = (
-    <Menu onClick={(e) => setSortLabel(e.key)}>
-      <Menu.Item key="Giá thấp trước">Giá thấp trước</Menu.Item>
-      <Menu.Item key="Giá cao trước">Giá cao trước</Menu.Item>
-    </Menu>
-  );
+  // Add sorting functions
+  const handlePriceSort = () => {
+    const newSort = priceSort === "asc" ? "desc" : "asc";
+    setPriceSort(newSort);
+    setSizeSort(null); // Reset size sort when sorting by price
 
-  const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-    if (e.target.value === "Tất cả") {
-      setFilteredProperties(properties);
-    } else {
-      setFilteredProperties(
-        properties.filter((property) => property.status === e.target.value)
+    const sorted = [...filteredProperties].sort((a, b) => {
+      const priceA = parseFloat(
+        a.price.replace(/[^0-9.,]/g, "").replace(",", ".")
+      );
+      const priceB = parseFloat(
+        b.price.replace(/[^0-9.,]/g, "").replace(",", ".")
+      );
+      return newSort === "asc" ? priceA - priceB : priceB - priceA;
+    });
+
+    setFilteredProperties(sorted);
+  };
+
+  const handleSizeSort = () => {
+    const newSort = sizeSort === "asc" ? "desc" : "asc";
+    setSizeSort(newSort);
+    setPriceSort(null); // Reset price sort when sorting by size
+
+    const sorted = [...filteredProperties].sort((a, b) => {
+      const sizeA = parseFloat(
+        a.size.replace(/[^0-9.,]/g, "").replace(",", ".")
+      );
+      const sizeB = parseFloat(
+        b.size.replace(/[^0-9.,]/g, "").replace(",", ".")
+      );
+      return newSort === "asc" ? sizeA - sizeB : sizeB - sizeA;
+    });
+
+    setFilteredProperties(sorted);
+  };
+
+  const applyFilters = (properties) => {
+    let filtered = [...properties];
+
+    // Price range filter
+    if (priceRange) {
+      filtered = filtered.filter((property) => {
+        // Convert "6.5 triệu" or "4,2 triệu" to number
+        const priceText = property.price.toLowerCase();
+        const priceNumber =
+          parseFloat(priceText.replace("triệu", "").replace(",", ".").trim()) *
+          1000000; // Convert to actual value
+
+        return priceNumber >= priceRange.min && priceNumber <= priceRange.max;
+      });
+    }
+
+    // Size range filter
+    if (sizeRange) {
+      filtered = filtered.filter((property) => {
+        // Handle the space before the number and any other formatting
+        const sizeNumber = parseFloat(
+          property.size
+            .trim() // Remove leading/trailing spaces
+            .replace(/\s+/g, "") // Remove all spaces
+            .replace("m2", "")
+            .replace("m²", "")
+        );
+
+        console.log("Size:", property.size, "Parsed:", sizeNumber); // For debugging
+        return (
+          !isNaN(sizeNumber) &&
+          sizeNumber >= sizeRange.min &&
+          sizeNumber <= sizeRange.max
+        );
+      });
+    }
+
+    // Status filter
+    if (statusFilter) {
+      filtered = filtered.filter(
+        (property) => property.status === statusFilter
       );
     }
+
+    // Area filter
+    if (areaFilter) {
+      filtered = filtered.filter((property) => property.area === areaFilter);
+    }
+
+    // Utilities filter
+    if (selectedUtilities.length > 0) {
+      filtered = filtered.filter((property) =>
+        selectedUtilities.every(
+          (utility) =>
+            property.utilities && property.utilities[utility] === true
+        )
+      );
+    }
+
+    return filtered;
   };
 
+  useEffect(() => {
+    const filtered = applyFilters(properties);
+    setFilteredProperties(filtered);
+  }, [
+    properties,
+    priceRange,
+    sizeRange,
+    statusFilter,
+    areaFilter,
+    selectedUtilities,
+  ]);
+
   const handlePriceFilter = (min, max) => {
-    setFilteredProperties(
-      properties.filter(
-        (property) => property.price >= min && property.price <= max
-      )
+    setPriceRange({ min, max });
+  };
+
+  const handleSizeFilter = (min, max) => {
+    setSizeRange({ min, max });
+    console.log(`Setting size range: ${min} - ${max}`); // For debugging
+  };
+
+  const clearFilters = () => {
+    setPriceRange(null);
+    setSizeRange(null);
+    setStatusFilter(null);
+    setAreaFilter(null);
+    setSelectedUtilities([]);
+    setFilteredProperties(properties); // Reset to original properties
+    message.success("Đã xóa tất cả bộ lọc"); // Show success message
+  };
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const storedUserData = localStorage.getItem("user");
+    if (storedUserData) {
+      setUserData(JSON.parse(storedUserData));
+    }
+    const fetchProperties = async () => {
+      try {
+        const response = await api.get("api/Home/GetAll");
+        setProperties(response.data);
+        setFilteredProperties(response.data);
+      } catch (error) {
+        setError(error.message);
+        message.error("Failed to fetch properties");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
+  const renderLocation = (location) => {
+    if (!userData || !userData.isActiveMember) {
+      return (
+        <Space>
+          <EnvironmentOutlined />
+          <Text type="secondary">
+            <Link to="/auth" style={{ color: "#1890ff" }}>
+              Subscribe to view location
+            </Link>
+          </Text>
+        </Space>
+      );
+    }
+
+    return (
+      <Space>
+        <EnvironmentOutlined />
+        <Text>{formatAddress(location)}</Text>
+      </Space>
     );
   };
+
+  const formatAddress = (location) => {
+    if (!location) return "";
+    const parts = [
+      location.houseNumber,
+      location.street,
+      location.town,
+      location.district,
+      location.province,
+    ].filter(Boolean);
+    return parts.join(", ");
+  };
+
+  const renderUtilities = (utilities) => {
+    if (!utilities) return null;
+    const activeUtilities = Object.entries(utilities)
+      .filter(([key, value]) => value === true && key !== "utilitiesId")
+      .map(([key]) => {
+        const formatKey = key.charAt(0).toUpperCase() + key.slice(1);
+        return (
+          <Tag key={key} color="blue">
+            {formatKey}
+          </Tag>
+        );
+      });
+    return <Space wrap>{activeUtilities}</Space>;
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -93,233 +262,318 @@ const PropertyList = () => {
           marginBottom: "64px",
         }}
       >
+        {/* Filter controls */}
         <div
           style={{
             display: "flex",
             justifyContent: "center",
-            marginBottom: "10px",
+            marginBottom: "20px",
           }}
         >
           <Space>
             <Button icon={<FilterOutlined />} type="text" value="large">
               Lọc
             </Button>
-            <Button className="gradient-button" type="text" value="large">
+            {/* <Button className="gradient-button" type="text" value="large">
               Quận 12
+            </Button> */}
+            <Button
+              className="gradient-button"
+              type="text"
+              value="large"
+              onClick={handlePriceSort}
+              icon={
+                priceSort ? (
+                  priceSort === "asc" ? (
+                    <ArrowUpOutlined />
+                  ) : (
+                    <ArrowDownOutlined />
+                  )
+                ) : null
+              }
+            >
+              Giá thuê{" "}
+              {priceSort === "asc"
+                ? "(Thấp - Cao)"
+                : priceSort === "desc"
+                ? "(Cao - Thấp)"
+                : ""}
             </Button>
-            <Button className="gradient-button" type="text" value="large">
-              Giá thuê
+
+            <Button
+              className="gradient-button"
+              type="text"
+              value="large"
+              onClick={handleSizeSort}
+              icon={
+                sizeSort ? (
+                  sizeSort === "asc" ? (
+                    <ArrowUpOutlined />
+                  ) : (
+                    <ArrowDownOutlined />
+                  )
+                ) : null
+              }
+            >
+              Diện tích{" "}
+              {sizeSort === "asc"
+                ? "(Nhỏ - Lớn)"
+                : sizeSort === "desc"
+                ? "(Lớn - Nhỏ)"
+                : ""}
             </Button>
-            <Button className="gradient-button" type="text" value="large">
-              Diện tích
-            </Button>
-            <Button className="gradient-button" type="text" value="large">
+            {/* <Button className="gradient-button" type="text" value="large">
               Tình trạng
-            </Button>
+            </Button> */}
           </Space>
         </div>
-        <Row gutter={16}>
-          <Col span={16}>
-            <div
-              style={{
-                marginBottom: "16px",
-                backgroundColor: "#f5f5f5",
-                padding: "10px",
-                borderRadius: "8px",
-              }}
-            >
-              <div className="scrollable-buttons">
-                <Space>
-                  <Button className="custom-button" type="default">
-                    Ký túc xá quận 12
-                  </Button>
-                  <Button className="custom-button" type="default">
-                    Phòng trọ nam ở ghép quận 12
-                  </Button>
-                  <Button className="custom-button" type="default">
-                    Phòng trọ gần đại học Nguyễn Tất Thành
-                  </Button>
-                  <Button className="custom-button" type="default">
-                    Phòng trọ nữ ở ghép quận 12
-                  </Button>
-                </Space>
-              </div>
-              <Space
+
+        {/* Main content area */}
+        <Row
+          gutter={[24, 24]}
+          style={{
+            minHeight: "calc(100vh - 200px)",
+            position: "relative",
+          }}
+        >
+          {/* House listings */}
+          <Col
+            span={16}
+            style={{
+              minHeight: "400px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {filteredProperties.length === 0 ? (
+              <div
                 style={{
-                  marginTop: "20px",
-                  justifyContent: "space-between",
-                  width: "100%",
+                  padding: "40px",
+                  background: "#ffffff",
+                  borderRadius: "8px",
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                <Radio.Group value={category} onChange={handleCategoryChange}>
-                  <Radio.Button value="Tất cả">Tất cả</Radio.Button>
-                  <Radio.Button value="Cá Nhân">Cá Nhân</Radio.Button>
-                  <Radio.Button value="Môi giới">Môi giới</Radio.Button>
-                </Radio.Group>
-                <Dropdown overlay={menu}>
-                  <Button className="gradient-button">
-                    {sortLabel} <DownOutlined />
-                  </Button>
-                </Dropdown>
-              </Space>
-            </div>
-            <List
-              itemLayout="vertical"
-              size="small"
-              dataSource={filteredProperties}
-              renderItem={(item) => (
-                <List.Item>
-                  <Card
-                    style={{ display: "flex", alignItems: "center" }}
-                    bodyStyle={{
-                      display: "flex",
-                      flexDirection: "row",
-                      padding: "10px",
-                    }}
+                <Empty
+                  description={<span>Không tìm thấy kết quả phù hợp</span>}
+                  style={{ margin: 0 }}
+                />
+              </div>
+            ) : (
+              <List
+                itemLayout="vertical"
+                size="large"
+                dataSource={filteredProperties}
+                renderItem={(item) => (
+                  <Link
+                    to={`/property/${item.homeId}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
                   >
-                    <img
-                      alt="property"
-                      src={item.image}
-                      style={{
-                        width: "150px",
-                        height: "100px",
-                        marginRight: "16px",
-                      }}
-                    />
-                    <div style={{ flex: 1 }}>
-                      <h3>{item.title}</h3>
-                      <p>{item.area}</p>
-                      <p style={{ color: "red", fontWeight: "bold" }}>
-                        {item.price}
-                      </p>
-                      <p>{item.location}</p>
+                    <List.Item style={{ marginBottom: "16px" }}>
+                      <Card hoverable style={{ width: "100%" }}>
+                        <Row gutter={16}>
+                          <Col span={8}>
+                            <img
+                              alt={item.name}
+                              src={
+                                item.homeImages?.[0]?.image?.imageUrl ||
+                                "https://via.placeholder.com/150"
+                              }
+                              style={{
+                                width: "100%",
+                                height: "200px",
+                                objectFit: "cover",
+                                borderRadius: "8px",
+                              }}
+                            />
+                          </Col>
+                          <Col span={16}>
+                            <Typography.Title level={4}>
+                              {item.name}
+                            </Typography.Title>
 
-                      <Space>
-                        <Button icon={<LaptopOutlined />} />
-                        <Typography style={{ marginRight: "10px" }}>
-                          Name
-                        </Typography>
-                        <Button icon={<RocketOutlined />} />
-                        <Typography style={{ marginRight: "350px" }}>
-                          Tin
-                        </Typography>
-                        <Button icon={<HeartOutlined />} danger />
-                      </Space>
-                    </div>
-                  </Card>
-                </List.Item>
-              )}
-            />
+                            <Space direction="vertical" size="small">
+                              <Text
+                                strong
+                                style={{ color: "#f5222d", fontSize: "18px" }}
+                              >
+                                {item.price}/tháng
+                              </Text>
+
+                              <Space>
+                                <HomeOutlined />
+                                <Text>{item.size}</Text>
+                                <Text>•</Text>
+                                <Text>{item.bedrooms} PN</Text>
+                                <Text>•</Text>
+                                <Text>{item.bathroom} VS</Text>
+                              </Space>
+
+                              {renderLocation(item.location)}
+
+                              <div style={{ marginTop: "8px" }}>
+                                {renderUtilities(item.utilities)}
+                              </div>
+                            </Space>
+                          </Col>
+                        </Row>
+                      </Card>
+                    </List.Item>
+                  </Link>
+                )}
+              />
+            )}
           </Col>
-          <Col span={8}>
+
+          {/* Filters Column */}
+          <Col
+            span={8}
+            style={{
+              position: "sticky",
+              top: 0,
+              height: "fit-content",
+            }}
+          >
             <div
               style={{
                 backgroundColor: "#f5f5f5",
-                padding: "10px",
+                padding: "16px",
                 borderRadius: "8px",
+                position: "sticky",
+                top: "85px",
+                width: "100%",
               }}
             >
-              <Collapse defaultActiveKey={["1"]}>
+              <Button
+                onClick={clearFilters}
+                style={{
+                  width: "100%",
+                  marginBottom: "16px",
+                  height: "40px",
+                  fontSize: "16px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                className="gradient-button"
+                icon={<FilterOutlined />}
+              >
+                Xóa bộ lọc
+              </Button>
+              <Collapse defaultActiveKey={["1", "2", "3", "4"]}>
                 <Panel header="Lọc theo khoảng giá" key="1">
-                  <ul>
-                    <li>
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    {[
+                      { text: "Dưới 2 triệu", range: [0, 2000000] },
+                      { text: "2 - 3 triệu", range: [2000000, 3000000] },
+                      { text: "3 - 5 triệu", range: [3000000, 5000000] },
+                      { text: "5 - 7 triệu", range: [5000000, 7000000] },
+                      { text: "7 - 10 triệu", range: [7000000, 10000000] },
+                      { text: "Trên 10 triệu", range: [10000000, Infinity] },
+                    ].map((item, index) => (
                       <Button
-                        type="text"
-                        onClick={() => handlePriceFilter(0, 1000000)}
+                        key={index}
+                        type={
+                          priceRange?.min === item.range[0] ? "primary" : "text"
+                        }
+                        onClick={() => handlePriceFilter(...item.range)}
+                        style={{
+                          width: "100%",
+                          height: "36px",
+                          padding: "0 12px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
+                        }}
                       >
-                        Dưới 1 triệu
+                        <span style={{ marginLeft: "0" }}>{item.text}</span>
                       </Button>
-                    </li>
-                    <li>
-                      <Button
-                        type="text"
-                        onClick={() => handlePriceFilter(1000000, 2000000)}
-                      >
-                        1 - 2 triệu
-                      </Button>
-                    </li>
-                    <li>
-                      <Button
-                        type="text"
-                        onClick={() => handlePriceFilter(2000000, 3000000)}
-                      >
-                        2 - 3 triệu
-                      </Button>
-                    </li>
-                    <li>
-                      <Button
-                        type="text"
-                        onClick={() => handlePriceFilter(3000000, 5000000)}
-                      >
-                        3 - 5 triệu
-                      </Button>
-                    </li>
-                    <li>
-                      <Button
-                        type="text"
-                        onClick={() => handlePriceFilter(5000000, 7000000)}
-                      >
-                        5 - 7 triệu
-                      </Button>
-                    </li>
-                    <li>
-                      <Button
-                        type="text"
-                        onClick={() => handlePriceFilter(7000000, Infinity)}
-                      >
-                        Trên 7 triệu
-                      </Button>
-                    </li>
-                    <li>
-                      <Button type="text">Xem thêm</Button>
-                    </li>
-                  </ul>
+                    ))}
+                  </Space>
                 </Panel>
+
                 <Panel header="Lọc theo diện tích" key="2">
-                  <ul>
-                    <li>
-                      <Button type="text">Dưới 20 m²</Button>
-                    </li>
-                    <li>
-                      <Button type="text">20 - 30 m²</Button>
-                    </li>
-                    <li>
-                      <Button type="text">30 - 40 m²</Button>
-                    </li>
-                    <li>
-                      <Button type="text">40 - 50 m²</Button>
-                    </li>
-                    <li>
-                      <Button type="text">Trên 50 m²</Button>
-                    </li>
-                  </ul>
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    {[
+                      { text: "Dưới 30 m²", range: [0, 30] },
+                      { text: "30 - 50 m²", range: [30, 50] },
+                      { text: "50 - 80 m²", range: [50, 80] },
+                      { text: "80 - 100 m²", range: [80, 100] },
+                      { text: "Trên 100 m²", range: [100, Infinity] },
+                    ].map((item, index) => (
+                      <Button
+                        key={index}
+                        type={
+                          sizeRange?.min === item.range[0] ? "primary" : "text"
+                        }
+                        onClick={() => handleSizeFilter(...item.range)}
+                        style={{
+                          width: "100%",
+                          height: "36px",
+                          padding: "0 12px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
+                        }}
+                      >
+                        <span style={{ marginLeft: "0" }}>{item.text}</span>
+                      </Button>
+                    ))}
+                  </Space>
                 </Panel>
-                <Panel header="Lọc theo tình trạng" key="3">
-                  <ul>
-                    <li>
-                      <Button type="text">Nội thất cao cấp</Button>
-                    </li>
-                    <li>
-                      <Button type="text">Nội thất đầy đủ</Button>
-                    </li>
-                    <li>
-                      <Button type="text">Nhà trống</Button>
-                    </li>
-                  </ul>
+
+                {/* <Panel header="Lọc theo tình trạng" key="3">
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    {[
+                      { text: "Nội thất cao cấp", value: "cachep" },
+                      { text: "Nội thất đầy đủ", value: "full" },
+                      { text: "Nhà trống", value: "empty" },
+                    ].map((item, index) => (
+                      <Button
+                        key={index}
+                        type={statusFilter === item.value ? "primary" : "text"}
+                        onClick={() => handleStatusFilter(item.value)}
+                        style={{
+                          width: "100%",
+                          height: "36px",
+                          padding: "0 12px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-start",
+                        }}
+                      >
+                        <span style={{ marginLeft: "0" }}>{item.text}</span>
+                      </Button>
+                    ))}
+                  </Space>
                 </Panel>
+
                 <Panel header="Lọc theo khu vực" key="4">
-                  <ul>
-                    <li>
-                      <Button type="text">Phuờng An Phú</Button>
-                    </li>
-                    <li>
-                      <Button type="text">Phuờng An Phú</Button>
-                    </li>
-                    <li>
-                      <Button type="text">Phuờng An Phú</Button>
-                    </li>
-                  </ul>
-                </Panel>
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    {["Phường An Phú", "Phường An Phú", "Phường An Phú"].map(
+                      (area, index) => (
+                        <Button
+                          key={index}
+                          type={areaFilter === area ? "primary" : "text"}
+                          onClick={() => handleAreaFilter(area)}
+                          style={{
+                            width: "100%",
+                            height: "36px",
+                            padding: "0 12px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-start",
+                          }}
+                        >
+                          <span style={{ marginLeft: "0" }}>{area}</span>
+                        </Button>
+                      )
+                    )}
+                  </Space>
+                </Panel> */}
               </Collapse>
             </div>
           </Col>

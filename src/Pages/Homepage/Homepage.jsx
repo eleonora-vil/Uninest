@@ -130,19 +130,6 @@ export default function HomePage() {
                 {item.price}/Tháng
               </Typography>
             </Box>
-            {/* Removed postTime and postPlace as they're not in the API response */}
-            {/* <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-          <AccessTimeIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
-          <Typography variant="body2" color="text.secondary">
-            {item.postTime}
-          </Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", mt: 1 }}>
-          <LocationOnIcon sx={{ color: "gray", fontSize: 20, mr: 1 }} />
-          <Typography variant="body2" color="text.secondary">
-            {item.postPlace}
-          </Typography>
-        </Box> */}
           </CardContent>
         </Card>
       </Link>
