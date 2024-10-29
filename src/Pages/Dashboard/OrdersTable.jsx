@@ -62,6 +62,12 @@ const headCells = [
     label: "Status",
   },
   {
+    id: "createDate",
+    align: "left",
+    disablePadding: false,
+    label: "Create Date",
+  },
+  {
     id: "amount",
     align: "right",
     disablePadding: false,
@@ -90,22 +96,36 @@ function OrderTableHead({ order, orderBy }) {
   );
 }
 
-function OrderStatus({ status }) {
+function OrderStatus({ status, isDate = false }) {
+  if (isDate) {
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+    };
+    return <Typography>{formatDate(status)}</Typography>;
+  }
   let color;
   let title;
 
   switch (status.toLowerCase()) {
     case "active":
       color = "success";
-      title = "Active";
+      title = "PAID";
       break;
     case "pending":
       color = "warning";
-      title = "Pending";
+      title = "PENDING";
       break;
     case "cancelled":
       color = "error";
-      title = "Cancelled";
+      title = "CANCELLED";
       break;
     default:
       color = "primary";
@@ -182,6 +202,9 @@ export default function OrderTable() {
                     <TableCell>{row.username}</TableCell>
                     <TableCell>
                       <OrderStatus status={row.status} />
+                    </TableCell>
+                    <TableCell>
+                      <OrderStatus status={row.createDate} isDate={true} />
                     </TableCell>
                     <TableCell align="right">
                       <NumericFormat

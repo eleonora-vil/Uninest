@@ -25,7 +25,7 @@ const CustomSider = () => {
   const fetchUserProfile = async () => {
     try {
       const response = await getUserProfile();
-      console.log("User profile response:", response); // Keep this for debugging
+      // console.log("User profile response:", response); // Keep this for debugging
 
       if (response.data && response.data.success && response.data.result) {
         const userData = response.data.result;

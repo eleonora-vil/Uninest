@@ -1,14 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePayOS } from "payos-checkout";
 import api from "../../config/axios";
-import { Button, Modal, Typography, Space, InputNumber, message } from "antd";
+import { Button, Modal, Space, InputNumber, message } from "antd";
 
-const { Title } = Typography;
-
-const TopUpForm = ({ visible, onSuccess, onClose }) => {
-  const [amount, setAmount] = useState("");
+const TopUpForm = ({ visible, onSuccess, onClose, initialAmount = 0 }) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [amount, setAmount] = useState(initialAmount.toString());
   const [payOSConfig, setPayOSConfig] = useState({
     RETURN_URL: window.location.origin,
     ELEMENT_ID: "embedded-payment-container",
@@ -18,6 +16,11 @@ const TopUpForm = ({ visible, onSuccess, onClose }) => {
       onSuccess("Nạp tiền thành công");
     },
   });
+
+  // pass money needed for use something
+  useEffect(() => {
+    setAmount(initialAmount.toString());
+  }, [initialAmount]);
 
   const { open, exit } = usePayOS(payOSConfig);
 
@@ -48,19 +51,30 @@ const TopUpForm = ({ visible, onSuccess, onClose }) => {
     try {
       const response = await api.post(
         "/api/Payment/CheckOrderAndUpdateWallet",
-        orderCode
+        { orderCode: orderCode }, // Send as an object
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      if (
-        response.data.error === 0 &&
-        response.data.data.paymentInfo.Status === "PAID"
-      ) {
-        onSuccess("Nạp tiền thành công");
-        return true; // Indicate successful payment
+      if (response.data.error === 0) {
+        if (response.data.data.paymentInfo.status === "PAID") {
+          // Update the user's wallet balance in your application state
+          onSuccess(
+            `Nạp tiền thành công. Số dư mới: ${response.data.data.userInfo.wallet}`
+          );
+          return true; // Indicate successful payment
+        } else if (response.data.data.paymentInfo.status === "CANCELLED") {
+          message.error("Giao dịch đã bị hủy");
+          return true; // Stop checking as the order is cancelled
+        }
       }
       return false; // Payment not completed yet
     } catch (error) {
       console.error("Error checking order status:", error);
+      message.error("Lỗi khi kiểm tra trạng thái giao dịch");
       return false;
     }
   };
@@ -85,12 +99,15 @@ const TopUpForm = ({ visible, onSuccess, onClose }) => {
         }));
 
         const orderCode = response.data.data.paymentInfo.orderCode;
+        console.log(orderCode);
 
         // Start checking order status
         const checkInterval = setInterval(async () => {
-          const isPaid = await checkOrderStatus(orderCode);
-          if (isPaid) {
+          const isCompleted = await checkOrderStatus(orderCode);
+          if (isCompleted) {
             clearInterval(checkInterval);
+            resetForm();
+            onClose();
           }
         }, 5000);
 
@@ -121,6 +138,11 @@ const TopUpForm = ({ visible, onSuccess, onClose }) => {
     resetForm();
     onClose();
   };
+  // const handleCancel = useCallback(() => {
+  //   resetForm();
+  //   onClose(); // This will close the modal and return to the previous view
+  //   onReturnToMembership(); // This will trigger the return to the membership modal
+  // }, [resetForm, onClose, onReturnToMembership]);
 
   return (
     <Modal
