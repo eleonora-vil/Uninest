@@ -7,7 +7,6 @@ import {
   Upload,
   Col,
   Row,
-  Radio,
   Breadcrumb,
   message,
   Modal,
@@ -515,7 +514,9 @@ const PostProperty = () => {
                 >
                   <Select placeholder="Phòng trọ">
                     <Option value="phongtro">Phòng trọ</Option>
-                    <Option value="dichvu">Dịch vụ thứ 3</Option>
+                    <Option value="dichvu" disabled>
+                      Dịch vụ thứ 3 (Đang phát triển)
+                    </Option>
                   </Select>
                 </Form.Item>
 

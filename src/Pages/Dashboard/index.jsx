@@ -121,7 +121,7 @@ export default function DashboardDefault() {
             </Grid>
             <Grid item xs={12} sm={6} md={4} lg={3}>
               <AnalyticEcommerce
-                title="Total Transcations"
+                title="Total Successful Transcations"
                 count={dashboardData.totalTransactions.toString()}
               />
             </Grid>
