@@ -208,7 +208,7 @@ export default function HomePage() {
     return (
       <Box
         sx={{
-          width: { xs: "90%", sm: "80%", md: "60%", lg: "45%" },
+          width: { xs: "80%", sm: "70%", md: "50%", lg: "35%" },
           bgcolor: "#fff",
           boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
           borderRadius: 2,
