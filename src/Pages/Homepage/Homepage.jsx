@@ -405,7 +405,7 @@ export default function HomePage() {
           {/* Existing Main Content */}
           <Box
             sx={{
-              mt: "15vh",
+              mt: "10vh",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",

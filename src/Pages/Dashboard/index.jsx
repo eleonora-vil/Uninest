@@ -1,8 +1,6 @@
 // material-ui
 import React, { useState, useEffect } from "react";
 
-// import AvatarGroup from "@mui/material/AvatarGroup";
-// import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 
 import Stack from "@mui/material/Stack";
@@ -13,9 +11,7 @@ import Box from "@mui/material/Box";
 import MainCard from "../../components/MainCard";
 import AnalyticEcommerce from "../../components/cards/statistics/AnalyticEcommerce";
 import MonthlyBarChart from "./MonthlyBarChart";
-// import ReportAreaChart from "./ReportAreaChart";
 import UniqueVisitorCard from "./UniqueVisitorCard";
-// import SaleReportCard from "./SaleReportCard";
 import OrdersTable from "./OrdersTable";
 import FooterComponent from "../../components/Footer/Footer";
 import AppHeader from "../../components/Header/Header";
