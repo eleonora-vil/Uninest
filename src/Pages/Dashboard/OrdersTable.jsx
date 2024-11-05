@@ -9,6 +9,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
+import TablePagination from "@mui/material/TablePagination";
 import Box from "@mui/material/Box";
 import { NumericFormat } from "react-number-format";
 import Dot from "../../components/@extended/Dot";
@@ -148,6 +149,8 @@ export default function OrderTable() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     fetchTransactions();
@@ -164,6 +167,15 @@ export default function OrderTable() {
       setError("Failed to fetch transactions");
       setLoading(false);
     }
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   if (loading) return <Typography>Loading...</Typography>;
@@ -184,8 +196,9 @@ export default function OrderTable() {
         <Table aria-labelledby="tableTitle">
           <OrderTableHead order={order} orderBy={orderBy} />
           <TableBody>
-            {stableSort(transactions, getComparator(order, orderBy)).map(
-              (row, index) => {
+            {stableSort(transactions, getComparator(order, orderBy))
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => {
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
@@ -218,11 +231,19 @@ export default function OrderTable() {
                     </TableCell>
                   </TableRow>
                 );
-              }
-            )}
+              })}
           </TableBody>
         </Table>
       </TableContainer>
+      <TablePagination
+        component="div"
+        count={transactions.length}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        rowsPerPageOptions={[5, 10, 25]}
+      />
     </Box>
   );
 }
