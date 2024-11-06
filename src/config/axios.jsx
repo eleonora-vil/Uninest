@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "http://localhost:5010";
+const baseUrl = "http://fjourney.site:32771";
 
 const config = {
   baseUrl: baseUrl,
