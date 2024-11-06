@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "http://fjourney.site:32771";
+const baseUrl = "https://beuninest.fjourney.site";
 
 const config = {
   baseUrl: baseUrl,
