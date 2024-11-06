@@ -20,6 +20,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import api from "../../config/axios";
 import Uninest from "../../assets/Uninest.png";
+import loginBackground from "../../assets/login_background.jpg";
 
 // const customTheme = extendTheme({ defaultColorScheme: "dark" });
 
@@ -457,8 +458,7 @@ export default function AuthPage() {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          backgroundImage:
-            "url(https://scontent.fsgn20-1.fna.fbcdn.net/v/t1.15752-9/460598464_534420082301265_6938301985852954232_n.png?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeG37PdF0oLrKQzcFnoE1ptvqbY7IRP2WlaptjshE_ZaVi3VGqdMSXszQV29VjqKKlF3bzi6mKGA0VvKwVnR4ZRM&_nc_ohc=mm0qeprZUxMQ7kNvgGX5iTV&_nc_ht=scontent.fsgn20-1.fna&_nc_gid=AhhEhXd_XZ-VB48tNoTP19f&oh=03_Q7cD1QELVBYJq9nQMuFgkCCTsUBVMq7yuJxPfYrWu2ZuHXk9bQ&oe=6715B658)",
+          backgroundImage: `url(${loginBackground})`,
         })}
       />
     </CssVarsProvider>

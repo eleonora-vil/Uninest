@@ -62,11 +62,11 @@ export const getTotalEarningsByDay = () => {
   return api.get("/api/Dashboard/total-earnings-by-day");
 };
 
-export const getRecentUsers = (count = 10) => {
+export const getRecentUsers = (count = 30) => {
   return api.get(`/api/Dashboard/recent-users?count=${count}`);
 };
 
-export const getRecentTransactions = (count = 10) => {
+export const getRecentTransactions = (count = 120) => {
   return api.get(`/api/Dashboard/recent-transactions?count=${count}`);
 };
 export default api;

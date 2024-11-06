@@ -45,6 +45,7 @@ const categories = [
       {
         label: "Dịch vụ bên thứ ba",
         key: "setting:2",
+        disabled: true,
         navigate: "/services",
       },
     ],
