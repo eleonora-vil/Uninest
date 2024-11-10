@@ -243,7 +243,7 @@ const PostProperty = () => {
   const updateUserWallet = async (amount) => {
     try {
       const updateWalletResponse = await api.post(
-        `api/User/UpdateWallet?userId=${getUserIdFromLocalStorage()}&amount=${amount}`
+        `api/User/UpdateWalletAfterPosted?userId=${getUserIdFromLocalStorage()}&amount=${amount}`
       );
       if (updateWalletResponse.status === 200) {
         //message.success("Wallet updated successfully");
@@ -353,7 +353,7 @@ const PostProperty = () => {
       const userId = getUserIdFromLocalStorage();
       formData.append("UserId", userId);
       formData.append("Name", storedValues.tittle);
-      formData.append("Price", formatCurrency(storedValues.price));
+      formData.append("Price", storedValues.price);
       formData.append("Size", storedValues.size);
       formData.append("Description", storedValues.description);
       formData.append("Bathroom", storedValues.bathroom);
